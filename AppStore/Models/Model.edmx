@@ -1,0 +1,424 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="AppStoreModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="application">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="lock" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="device">
+          <Key>
+            <PropertyRef Name="type" />
+          </Key>
+          <Property Name="type" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="environment">
+          <Key>
+            <PropertyRef Name="type" />
+          </Key>
+          <Property Name="type" Type="varchar" MaxLength="12" Nullable="false" />
+        </EntityType>
+        <EntityType Name="icon">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="path" Type="varchar(max)" Nullable="false" />
+          <Property Name="application_id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="release">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="application_id" Type="int" Nullable="false" />
+          <Property Name="environment_type" Type="varchar" MaxLength="12" Nullable="false" />
+          <Property Name="device_type" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="version" Type="varchar(max)" Nullable="false" />
+          <Property Name="version_code" Type="int" Nullable="false" />
+          <Property Name="notes" Type="nvarchar(max)" />
+          <Property Name="icon_id" Type="int" Nullable="false" />
+          <Property Name="size" Type="bigint" Nullable="false" />
+          <Property Name="force_update" Type="bit" Nullable="false" />
+          <Property Name="lock" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="user">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="account_id" Type="varchar(max)" Nullable="false" />
+          <Property Name="password" Type="varchar(max)" Nullable="false" />
+          <Property Name="lock" Type="bit" Nullable="false" />
+        </EntityType>
+        <!--產生期間發現錯誤:
+警告 6002: 資料表/檢視 'AppStore.dbo.user_application' 未定義主索引鍵。已推斷此索引鍵，並將定義建立成唯讀的資料表/檢視。-->
+        <EntityType Name="user_application">
+          <Key>
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="application_id" />
+          </Key>
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="application_id" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_release_application">
+          <End Role="application" Type="Self.application" Multiplicity="1" />
+          <End Role="release" Type="Self.release" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="application">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="release">
+              <PropertyRef Name="application_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_release_device">
+          <End Role="device" Type="Self.device" Multiplicity="1" />
+          <End Role="release" Type="Self.release" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="release">
+              <PropertyRef Name="device_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_release_environment">
+          <End Role="environment" Type="Self.environment" Multiplicity="1" />
+          <End Role="release" Type="Self.release" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="environment">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="release">
+              <PropertyRef Name="environment_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_release_icon">
+          <End Role="icon" Type="Self.icon" Multiplicity="1" />
+          <End Role="release" Type="Self.release" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="icon">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="release">
+              <PropertyRef Name="icon_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_user_application_application">
+          <End Role="application" Type="Self.application" Multiplicity="1" />
+          <End Role="user_application" Type="Self.user_application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="application">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user_application">
+              <PropertyRef Name="application_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_user_application_user">
+          <End Role="user" Type="Self.user" Multiplicity="1" />
+          <End Role="user_application" Type="Self.user_application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user_application">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="AppStoreModelStoreContainer">
+          <EntitySet Name="application" EntityType="Self.application" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="device" EntityType="Self.device" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="environment" EntityType="Self.environment" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="icon" EntityType="Self.icon" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="release" EntityType="Self.release" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="user" EntityType="Self.user" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="user_application" EntityType="Self.user_application" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [user_application].[user_id] AS [user_id], 
+    [user_application].[application_id] AS [application_id]
+    FROM [dbo].[user_application] AS [user_application]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_release_application" Association="Self.FK_release_application">
+            <End Role="application" EntitySet="application" />
+            <End Role="release" EntitySet="release" />
+          </AssociationSet>
+          <AssociationSet Name="FK_release_device" Association="Self.FK_release_device">
+            <End Role="device" EntitySet="device" />
+            <End Role="release" EntitySet="release" />
+          </AssociationSet>
+          <AssociationSet Name="FK_release_environment" Association="Self.FK_release_environment">
+            <End Role="environment" EntitySet="environment" />
+            <End Role="release" EntitySet="release" />
+          </AssociationSet>
+          <AssociationSet Name="FK_release_icon" Association="Self.FK_release_icon">
+            <End Role="icon" EntitySet="icon" />
+            <End Role="release" EntitySet="release" />
+          </AssociationSet>
+          <AssociationSet Name="FK_user_application_application" Association="Self.FK_user_application_application">
+            <End Role="application" EntitySet="application" />
+            <End Role="user_application" EntitySet="user_application" />
+          </AssociationSet>
+          <AssociationSet Name="FK_user_application_user" Association="Self.FK_user_application_user">
+            <End Role="user" EntitySet="user" />
+            <End Role="user_application" EntitySet="user_application" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="AppStoreModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="AppStoreEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="application" EntityType="AppStoreModel.application" />
+          <EntitySet Name="device" EntityType="AppStoreModel.device" />
+          <EntitySet Name="environment" EntityType="AppStoreModel.environment" />
+          <EntitySet Name="icon" EntityType="AppStoreModel.icon" />
+          <EntitySet Name="release" EntityType="AppStoreModel.release" />
+          <EntitySet Name="user" EntityType="AppStoreModel.user" />
+          <AssociationSet Name="FK_release_application" Association="AppStoreModel.FK_release_application">
+            <End Role="application" EntitySet="application" />
+            <End Role="release" EntitySet="release" />
+          </AssociationSet>
+          <AssociationSet Name="FK_release_device" Association="AppStoreModel.FK_release_device">
+            <End Role="device" EntitySet="device" />
+            <End Role="release" EntitySet="release" />
+          </AssociationSet>
+          <AssociationSet Name="FK_release_environment" Association="AppStoreModel.FK_release_environment">
+            <End Role="environment" EntitySet="environment" />
+            <End Role="release" EntitySet="release" />
+          </AssociationSet>
+          <AssociationSet Name="FK_release_icon" Association="AppStoreModel.FK_release_icon">
+            <End Role="icon" EntitySet="icon" />
+            <End Role="release" EntitySet="release" />
+          </AssociationSet>
+          <AssociationSet Name="user_application" Association="AppStoreModel.user_application">
+            <End Role="application" EntitySet="application" />
+            <End Role="user" EntitySet="user" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="application">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="lock" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_application" FromRole="application" ToRole="release" />
+          <NavigationProperty Name="user" Relationship="AppStoreModel.user_application" FromRole="application" ToRole="user" />
+        </EntityType>
+        <EntityType Name="device">
+          <Key>
+            <PropertyRef Name="type" />
+          </Key>
+          <Property Name="type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_device" FromRole="device" ToRole="release" />
+        </EntityType>
+        <EntityType Name="environment">
+          <Key>
+            <PropertyRef Name="type" />
+          </Key>
+          <Property Name="type" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_environment" FromRole="environment" ToRole="release" />
+        </EntityType>
+        <EntityType Name="icon">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="path" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="application_id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_icon" FromRole="icon" ToRole="release" />
+        </EntityType>
+        <EntityType Name="release">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="application_id" Type="Int32" Nullable="false" />
+          <Property Name="environment_type" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="false" />
+          <Property Name="device_type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="version" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="version_code" Type="Int32" Nullable="false" />
+          <Property Name="notes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="icon_id" Type="Int32" Nullable="false" />
+          <Property Name="size" Type="Int64" Nullable="false" />
+          <Property Name="force_update" Type="Boolean" Nullable="false" />
+          <Property Name="lock" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="application" Relationship="AppStoreModel.FK_release_application" FromRole="release" ToRole="application" />
+          <NavigationProperty Name="device" Relationship="AppStoreModel.FK_release_device" FromRole="release" ToRole="device" />
+          <NavigationProperty Name="environment" Relationship="AppStoreModel.FK_release_environment" FromRole="release" ToRole="environment" />
+          <NavigationProperty Name="icon" Relationship="AppStoreModel.FK_release_icon" FromRole="release" ToRole="icon" />
+        </EntityType>
+        <EntityType Name="user">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="account_id" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="password" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="lock" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="application" Relationship="AppStoreModel.user_application" FromRole="user" ToRole="application" />
+        </EntityType>
+        <Association Name="FK_release_application">
+          <End Type="AppStoreModel.application" Role="application" Multiplicity="1" />
+          <End Type="AppStoreModel.release" Role="release" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="application">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="release">
+              <PropertyRef Name="application_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_release_device">
+          <End Type="AppStoreModel.device" Role="device" Multiplicity="1" />
+          <End Type="AppStoreModel.release" Role="release" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="release">
+              <PropertyRef Name="device_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_release_environment">
+          <End Type="AppStoreModel.environment" Role="environment" Multiplicity="1" />
+          <End Type="AppStoreModel.release" Role="release" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="environment">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="release">
+              <PropertyRef Name="environment_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_release_icon">
+          <End Type="AppStoreModel.icon" Role="icon" Multiplicity="1" />
+          <End Type="AppStoreModel.release" Role="release" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="icon">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="release">
+              <PropertyRef Name="icon_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="user_application">
+          <End Type="AppStoreModel.application" Role="application" Multiplicity="*" />
+          <End Type="AppStoreModel.user" Role="user" Multiplicity="*" />
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="AppStoreModelStoreContainer" CdmEntityContainer="AppStoreEntities">
+          <EntitySetMapping Name="application">
+            <EntityTypeMapping TypeName="AppStoreModel.application">
+              <MappingFragment StoreEntitySet="application">
+                <ScalarProperty Name="lock" ColumnName="lock" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="device">
+            <EntityTypeMapping TypeName="AppStoreModel.device">
+              <MappingFragment StoreEntitySet="device">
+                <ScalarProperty Name="type" ColumnName="type" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="environment">
+            <EntityTypeMapping TypeName="AppStoreModel.environment">
+              <MappingFragment StoreEntitySet="environment">
+                <ScalarProperty Name="type" ColumnName="type" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="icon">
+            <EntityTypeMapping TypeName="AppStoreModel.icon">
+              <MappingFragment StoreEntitySet="icon">
+                <ScalarProperty Name="application_id" ColumnName="application_id" />
+                <ScalarProperty Name="path" ColumnName="path" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="release">
+            <EntityTypeMapping TypeName="AppStoreModel.release">
+              <MappingFragment StoreEntitySet="release">
+                <ScalarProperty Name="lock" ColumnName="lock" />
+                <ScalarProperty Name="force_update" ColumnName="force_update" />
+                <ScalarProperty Name="size" ColumnName="size" />
+                <ScalarProperty Name="icon_id" ColumnName="icon_id" />
+                <ScalarProperty Name="notes" ColumnName="notes" />
+                <ScalarProperty Name="version_code" ColumnName="version_code" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="device_type" ColumnName="device_type" />
+                <ScalarProperty Name="environment_type" ColumnName="environment_type" />
+                <ScalarProperty Name="application_id" ColumnName="application_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="user">
+            <EntityTypeMapping TypeName="AppStoreModel.user">
+              <MappingFragment StoreEntitySet="user">
+                <ScalarProperty Name="lock" ColumnName="lock" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="account_id" ColumnName="account_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="user_application" TypeName="AppStoreModel.user_application" StoreEntitySet="user_application">
+            <EndProperty Name="user">
+              <ScalarProperty Name="id" ColumnName="user_id" />
+            </EndProperty>
+            <EndProperty Name="application">
+              <ScalarProperty Name="id" ColumnName="application_id" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="無" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
