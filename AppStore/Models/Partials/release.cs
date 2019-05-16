@@ -24,12 +24,6 @@ namespace AppStore.Models
             public string environment_type { get; set; }
 
             /// <summary>
-            /// 該應用程式所屬設備(Android or iOS)
-            /// </summary>
-            [Display(Name = "該應用程式所屬設備(Android or iOS)")]
-            public string device_type { get; set; }
-
-            /// <summary>
             /// 版號(string)
             /// </summary>
             [Display(Name = "版號(string)")]

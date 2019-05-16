@@ -17,7 +17,6 @@ namespace AppStore.Models
         public int id { get; set; }
         public int application_id { get; set; }
         public string environment_type { get; set; }
-        public string device_type { get; set; }
         public string version { get; set; }
         public int version_code { get; set; }
         public string notes { get; set; }
@@ -27,7 +26,6 @@ namespace AppStore.Models
         public bool @lock { get; set; }
     
         public virtual application application { get; set; }
-        public virtual device device { get; set; }
         public virtual environment environment { get; set; }
         public virtual icon icon { get; set; }
     }

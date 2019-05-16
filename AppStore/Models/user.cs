@@ -22,9 +22,11 @@ namespace AppStore.Models
     
         public int id { get; set; }
         public string account_id { get; set; }
+        public string role { get; set; }
         public string password { get; set; }
         public bool @lock { get; set; }
     
+        public virtual user_role user_role { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<application> application { get; set; }
     }

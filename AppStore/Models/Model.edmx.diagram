@@ -5,16 +5,18 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="4c128735da7b49a599682139e7ae849a" Name="Diagram1" ZoomLevel="62">
-        <EntityTypeShape EntityType="AppStoreModel.application" Width="1.5" PointX="0.75" PointY="3.75" />
-        <EntityTypeShape EntityType="AppStoreModel.device" Width="1.5" PointX="3.75" PointY="9.375" />
-        <EntityTypeShape EntityType="AppStoreModel.environment" Width="1.5" PointX="3.75" PointY="0.75" />
-        <EntityTypeShape EntityType="AppStoreModel.icon" Width="1.5" PointX="3.75" PointY="6.875" />
-        <EntityTypeShape EntityType="AppStoreModel.release" Width="1.5" PointX="6" PointY="2.875" />
-        <EntityTypeShape EntityType="AppStoreModel.user" Width="1.5" PointX="3" PointY="3.75" />
+        <EntityTypeShape EntityType="AppStoreModel.application" Width="1.5" PointX="3" PointY="3.5" />
+        <EntityTypeShape EntityType="AppStoreModel.device" Width="1.5" PointX="0.75" PointY="4" />
+        <EntityTypeShape EntityType="AppStoreModel.environment" Width="1.5" PointX="6" PointY="0.75" />
+        <EntityTypeShape EntityType="AppStoreModel.icon" Width="1.5" PointX="6" PointY="6.875" />
+        <EntityTypeShape EntityType="AppStoreModel.release" Width="1.5" PointX="8.25" PointY="3" />
+        <EntityTypeShape EntityType="AppStoreModel.user" Width="1.5" PointX="5.25" PointY="3.5" />
+        <EntityTypeShape EntityType="AppStoreModel.user_role" Width="1.5" PointX="3" PointY="1" />
+        <AssociationConnector Association="AppStoreModel.FK_application_device" />
         <AssociationConnector Association="AppStoreModel.FK_release_application" />
-        <AssociationConnector Association="AppStoreModel.FK_release_device" />
         <AssociationConnector Association="AppStoreModel.FK_release_environment" />
         <AssociationConnector Association="AppStoreModel.FK_release_icon" />
+        <AssociationConnector Association="AppStoreModel.FK_user_user_role" />
         <AssociationConnector Association="AppStoreModel.user_application" />
       </Diagram>
     </edmx:Diagrams>

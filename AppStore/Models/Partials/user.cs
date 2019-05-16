@@ -18,6 +18,12 @@ namespace AppStore.Models
             public string account_id { get; set; }
 
             /// <summary>
+            /// 權限
+            /// </summary>
+            [Display(Name = "權限")]
+            public string role { get; set; }
+
+            /// <summary>
             /// 密碼
             /// </summary>
             [Display(Name = "密碼")]
@@ -29,6 +35,8 @@ namespace AppStore.Models
             [Display(Name = "使用者是否啟用")]
             public bool @lock { get; set; }
 
+            [JsonIgnore]
+            public virtual user_role user_role { get; set; }
             [JsonIgnore]
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
             public virtual ICollection<application> application { get; set; }

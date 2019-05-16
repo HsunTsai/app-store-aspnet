@@ -11,6 +11,7 @@
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="device_type" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="lock" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="device">
@@ -40,7 +41,6 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="application_id" Type="int" Nullable="false" />
           <Property Name="environment_type" Type="varchar" MaxLength="12" Nullable="false" />
-          <Property Name="device_type" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="version" Type="varchar(max)" Nullable="false" />
           <Property Name="version_code" Type="int" Nullable="false" />
           <Property Name="notes" Type="nvarchar(max)" />
@@ -55,6 +55,7 @@
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="account_id" Type="varchar(max)" Nullable="false" />
+          <Property Name="role" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="password" Type="varchar(max)" Nullable="false" />
           <Property Name="lock" Type="bit" Nullable="false" />
         </EntityType>
@@ -68,6 +69,24 @@
           <Property Name="user_id" Type="int" Nullable="false" />
           <Property Name="application_id" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="user_role">
+          <Key>
+            <PropertyRef Name="type" />
+          </Key>
+          <Property Name="type" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_application_device">
+          <End Role="device" Type="Self.device" Multiplicity="1" />
+          <End Role="application" Type="Self.application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="application">
+              <PropertyRef Name="device_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_release_application">
           <End Role="application" Type="Self.application" Multiplicity="1" />
           <End Role="release" Type="Self.release" Multiplicity="*" />
@@ -77,18 +96,6 @@
             </Principal>
             <Dependent Role="release">
               <PropertyRef Name="application_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_release_device">
-          <End Role="device" Type="Self.device" Multiplicity="1" />
-          <End Role="release" Type="Self.release" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="device">
-              <PropertyRef Name="type" />
-            </Principal>
-            <Dependent Role="release">
-              <PropertyRef Name="device_type" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -140,6 +147,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_user_user_role">
+          <End Role="user_role" Type="Self.user_role" Multiplicity="1" />
+          <End Role="user" Type="Self.user" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user_role">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="user">
+              <PropertyRef Name="role" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="AppStoreModelStoreContainer">
           <EntitySet Name="application" EntityType="Self.application" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="device" EntityType="Self.device" Schema="dbo" store:Type="Tables" />
@@ -147,18 +166,19 @@
           <EntitySet Name="icon" EntityType="Self.icon" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="release" EntityType="Self.release" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user" EntityType="Self.user" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="user_role" EntityType="Self.user_role" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user_application" EntityType="Self.user_application" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [user_application].[user_id] AS [user_id], 
     [user_application].[application_id] AS [application_id]
     FROM [dbo].[user_application] AS [user_application]</DefiningQuery>
           </EntitySet>
+          <AssociationSet Name="FK_application_device" Association="Self.FK_application_device">
+            <End Role="device" EntitySet="device" />
+            <End Role="application" EntitySet="application" />
+          </AssociationSet>
           <AssociationSet Name="FK_release_application" Association="Self.FK_release_application">
             <End Role="application" EntitySet="application" />
-            <End Role="release" EntitySet="release" />
-          </AssociationSet>
-          <AssociationSet Name="FK_release_device" Association="Self.FK_release_device">
-            <End Role="device" EntitySet="device" />
             <End Role="release" EntitySet="release" />
           </AssociationSet>
           <AssociationSet Name="FK_release_environment" Association="Self.FK_release_environment">
@@ -177,6 +197,10 @@
             <End Role="user" EntitySet="user" />
             <End Role="user_application" EntitySet="user_application" />
           </AssociationSet>
+          <AssociationSet Name="FK_user_user_role" Association="Self.FK_user_user_role">
+            <End Role="user_role" EntitySet="user_role" />
+            <End Role="user" EntitySet="user" />
+          </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -189,12 +213,13 @@
           <EntitySet Name="icon" EntityType="AppStoreModel.icon" />
           <EntitySet Name="release" EntityType="AppStoreModel.release" />
           <EntitySet Name="user" EntityType="AppStoreModel.user" />
+          <EntitySet Name="user_role" EntityType="AppStoreModel.user_role" />
+          <AssociationSet Name="FK_application_device" Association="AppStoreModel.FK_application_device">
+            <End Role="device" EntitySet="device" />
+            <End Role="application" EntitySet="application" />
+          </AssociationSet>
           <AssociationSet Name="FK_release_application" Association="AppStoreModel.FK_release_application">
             <End Role="application" EntitySet="application" />
-            <End Role="release" EntitySet="release" />
-          </AssociationSet>
-          <AssociationSet Name="FK_release_device" Association="AppStoreModel.FK_release_device">
-            <End Role="device" EntitySet="device" />
             <End Role="release" EntitySet="release" />
           </AssociationSet>
           <AssociationSet Name="FK_release_environment" Association="AppStoreModel.FK_release_environment">
@@ -204,6 +229,10 @@
           <AssociationSet Name="FK_release_icon" Association="AppStoreModel.FK_release_icon">
             <End Role="icon" EntitySet="icon" />
             <End Role="release" EntitySet="release" />
+          </AssociationSet>
+          <AssociationSet Name="FK_user_user_role" Association="AppStoreModel.FK_user_user_role">
+            <End Role="user_role" EntitySet="user_role" />
+            <End Role="user" EntitySet="user" />
           </AssociationSet>
           <AssociationSet Name="user_application" Association="AppStoreModel.user_application">
             <End Role="application" EntitySet="application" />
@@ -216,7 +245,9 @@
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="device_type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="lock" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="device" Relationship="AppStoreModel.FK_application_device" FromRole="application" ToRole="device" />
           <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_application" FromRole="application" ToRole="release" />
           <NavigationProperty Name="user" Relationship="AppStoreModel.user_application" FromRole="application" ToRole="user" />
         </EntityType>
@@ -225,7 +256,7 @@
             <PropertyRef Name="type" />
           </Key>
           <Property Name="type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_device" FromRole="device" ToRole="release" />
+          <NavigationProperty Name="application" Relationship="AppStoreModel.FK_application_device" FromRole="device" ToRole="application" />
         </EntityType>
         <EntityType Name="environment">
           <Key>
@@ -250,7 +281,6 @@
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="application_id" Type="Int32" Nullable="false" />
           <Property Name="environment_type" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="false" />
-          <Property Name="device_type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="version" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="version_code" Type="Int32" Nullable="false" />
           <Property Name="notes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
@@ -259,7 +289,6 @@
           <Property Name="force_update" Type="Boolean" Nullable="false" />
           <Property Name="lock" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="application" Relationship="AppStoreModel.FK_release_application" FromRole="release" ToRole="application" />
-          <NavigationProperty Name="device" Relationship="AppStoreModel.FK_release_device" FromRole="release" ToRole="device" />
           <NavigationProperty Name="environment" Relationship="AppStoreModel.FK_release_environment" FromRole="release" ToRole="environment" />
           <NavigationProperty Name="icon" Relationship="AppStoreModel.FK_release_icon" FromRole="release" ToRole="icon" />
         </EntityType>
@@ -269,10 +298,31 @@
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="account_id" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="role" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="password" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="lock" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="user_role" Relationship="AppStoreModel.FK_user_user_role" FromRole="user" ToRole="user_role" />
           <NavigationProperty Name="application" Relationship="AppStoreModel.user_application" FromRole="user" ToRole="application" />
         </EntityType>
+        <EntityType Name="user_role">
+          <Key>
+            <PropertyRef Name="type" />
+          </Key>
+          <Property Name="type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="user" Relationship="AppStoreModel.FK_user_user_role" FromRole="user_role" ToRole="user" />
+        </EntityType>
+        <Association Name="FK_application_device">
+          <End Type="AppStoreModel.device" Role="device" Multiplicity="1" />
+          <End Type="AppStoreModel.application" Role="application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="application">
+              <PropertyRef Name="device_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_release_application">
           <End Type="AppStoreModel.application" Role="application" Multiplicity="1" />
           <End Type="AppStoreModel.release" Role="release" Multiplicity="*" />
@@ -282,18 +332,6 @@
             </Principal>
             <Dependent Role="release">
               <PropertyRef Name="application_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_release_device">
-          <End Type="AppStoreModel.device" Role="device" Multiplicity="1" />
-          <End Type="AppStoreModel.release" Role="release" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="device">
-              <PropertyRef Name="type" />
-            </Principal>
-            <Dependent Role="release">
-              <PropertyRef Name="device_type" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -321,11 +359,23 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_user_user_role">
+          <End Type="AppStoreModel.user_role" Role="user_role" Multiplicity="1" />
+          <End Type="AppStoreModel.user" Role="user" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user_role">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="user">
+              <PropertyRef Name="role" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="user_application">
           <End Type="AppStoreModel.application" Role="application" Multiplicity="*" />
           <End Type="AppStoreModel.user" Role="user" Multiplicity="*" />
         </Association>
-      </Schema>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -335,6 +385,7 @@
             <EntityTypeMapping TypeName="AppStoreModel.application">
               <MappingFragment StoreEntitySet="application">
                 <ScalarProperty Name="lock" ColumnName="lock" />
+                <ScalarProperty Name="device_type" ColumnName="device_type" />
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
@@ -373,7 +424,6 @@
                 <ScalarProperty Name="notes" ColumnName="notes" />
                 <ScalarProperty Name="version_code" ColumnName="version_code" />
                 <ScalarProperty Name="version" ColumnName="version" />
-                <ScalarProperty Name="device_type" ColumnName="device_type" />
                 <ScalarProperty Name="environment_type" ColumnName="environment_type" />
                 <ScalarProperty Name="application_id" ColumnName="application_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
@@ -385,8 +435,16 @@
               <MappingFragment StoreEntitySet="user">
                 <ScalarProperty Name="lock" ColumnName="lock" />
                 <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="role" ColumnName="role" />
                 <ScalarProperty Name="account_id" ColumnName="account_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="user_role">
+            <EntityTypeMapping TypeName="AppStoreModel.user_role">
+              <MappingFragment StoreEntitySet="user_role">
+                <ScalarProperty Name="type" ColumnName="type" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

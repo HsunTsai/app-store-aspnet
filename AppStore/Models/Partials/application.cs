@@ -9,11 +9,6 @@ namespace AppStore.Models
     {
         public class applicationMetadata
         {
-            public applicationMetadata()
-            {
-                this.@lock = false;
-            }
-
             public int id { get; set; }
 
             /// <summary>
@@ -23,10 +18,16 @@ namespace AppStore.Models
             public string name { get; set; }
 
             /// <summary>
+            /// 該應用程式所屬設備(Android iOS win32 win64)
+            /// </summary>
+            [Display(Name = "該應用程式所屬設備(Android iOS win32 win64)")]
+            public string device_type { get; set; }
+
+            /// <summary>
             /// 是否將應用程式關閉或下架
             /// </summary>
             [Display(Name = "是否將應用程式關閉或下架")]
-            public bool @lock { get; set; }
+            public bool @lock { get; set; } = false;
 
             [JsonIgnore]
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

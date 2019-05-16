@@ -31,5 +31,6 @@ namespace AppStore.Models
         public virtual DbSet<icon> icon { get; set; }
         public virtual DbSet<release> release { get; set; }
         public virtual DbSet<user> user { get; set; }
+        public virtual DbSet<user_role> user_role { get; set; }
     }
 }

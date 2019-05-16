@@ -12,23 +12,16 @@ namespace AppStore.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class application
+    public partial class user_role
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public application()
+        public user_role()
         {
-            this.release = new HashSet<release>();
             this.user = new HashSet<user>();
         }
     
-        public int id { get; set; }
-        public string name { get; set; }
-        public string device_type { get; set; }
-        public bool @lock { get; set; }
+        public string type { get; set; }
     
-        public virtual device device { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<release> release { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<user> user { get; set; }
     }

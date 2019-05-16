@@ -17,12 +17,12 @@ namespace AppStore.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public device()
         {
-            this.release = new HashSet<release>();
+            this.application = new HashSet<application>();
         }
     
         public string type { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<release> release { get; set; }
+        public virtual ICollection<application> application { get; set; }
     }
 }
