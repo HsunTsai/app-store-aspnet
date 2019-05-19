@@ -175,12 +175,18 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\LogoutController.cs" />
+    <Compile Include="Controllers\trackingsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
+    <Compile Include="DAO\ApplicationDAO.cs" />
+    <Compile Include="DAO\UserDAO.cs" />
     <Compile Include="Filters\JwtAuthAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\MainHelper.cs" />
+    <Compile Include="Models\action.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\APIResult.cs" />
     <Compile Include="Models\application.cs">
       <DependentUpon>Model.tt</DependentUpon>
@@ -192,6 +198,9 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\icon.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\mobile_crash.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Model.Context.cs">
@@ -213,10 +222,19 @@
     <Compile Include="Models\Partials\release.cs" />
     <Compile Include="Models\Partials\icon.cs" />
     <Compile Include="Models\Partials\application.cs" />
+    <Compile Include="Models\privacy.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\release.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tracking.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\user.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\user_application.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\user_role.cs">

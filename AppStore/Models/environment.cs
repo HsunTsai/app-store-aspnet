@@ -14,12 +14,14 @@ namespace AppStore.Models
     
     public partial class environment
     {
+    	partial void Initialize();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public environment()
         {
             this.mobile_crash = new HashSet<mobile_crash>();
             this.release = new HashSet<release>();
             this.tracking = new HashSet<tracking>();
+    		Initialize();
         }
     
         public string type { get; set; }

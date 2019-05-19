@@ -13,8 +13,8 @@ namespace AppStore
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
+                routeTemplate: "api/{controller}/{type}",
+                defaults: new { type = RouteParameter.Optional }
             );
         }
     }

@@ -14,10 +14,12 @@ namespace AppStore.Models
     
     public partial class user_role
     {
+    	partial void Initialize();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public user_role()
         {
             this.user = new HashSet<user>();
+    		Initialize();
         }
     
         public string type { get; set; }

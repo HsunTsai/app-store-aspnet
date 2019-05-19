@@ -12,15 +12,13 @@ namespace AppStore.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class device
+    public partial class privacy
     {
     	partial void Initialize();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public device()
+        public privacy()
         {
             this.application = new HashSet<application>();
-            this.mobile_crash = new HashSet<mobile_crash>();
-            this.tracking = new HashSet<tracking>();
     		Initialize();
         }
     
@@ -28,9 +26,5 @@ namespace AppStore.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<application> application { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<mobile_crash> mobile_crash { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tracking> tracking { get; set; }
     }
 }

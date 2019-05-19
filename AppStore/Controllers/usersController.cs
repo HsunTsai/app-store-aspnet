@@ -38,7 +38,7 @@ namespace AppStore.Controllers
                 return BadRequest(ModelState);
             }
 
-            user searchUser = (from dbUser in db.user where user.account_id == dbUser.account_id select user).Single();
+            user searchUser = (from dbUser in db.user where user.id == dbUser.id select user).Single();
 
             if (null == searchUser) return NotFound();
 
@@ -69,7 +69,7 @@ namespace AppStore.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (userExists(user.account_id))
+            if (userExists(user.id))
             {
                 db.user.Add(user);
                 db.SaveChanges();
@@ -91,9 +91,9 @@ namespace AppStore.Controllers
             base.Dispose(disposing);
         }
 
-        private bool userExists(string account_id)
+        private bool userExists(string id)
         {
-            return db.user.Count(e => e.account_id == account_id) > 0;
+            return db.user.Count(e => e.id == id) > 0;
         }
     }
 }

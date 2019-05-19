@@ -14,6 +14,7 @@ namespace AppStore.Models
     
     public partial class mobile_crash
     {
+    	partial void Initialize();
         public int id { get; set; }
         public int application_id { get; set; }
         public string device_type { get; set; }

@@ -5,13 +5,11 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="AppStoreModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <!--產生期間發現錯誤:
-警告 6002: 資料表/檢視 'AppStore.dbo.action' 未定義主索引鍵。已推斷此索引鍵，並將定義建立成唯讀的資料表/檢視。-->
         <EntityType Name="action">
           <Key>
-            <PropertyRef Name="application_id" />
-            <PropertyRef Name="id" />
+            <PropertyRef Name="auto_id" />
           </Key>
+          <Property Name="auto_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="application_id" Type="int" Nullable="false" />
           <Property Name="id" Type="varchar(max)" Nullable="false" />
           <Property Name="note" Type="nvarchar(max)" />
@@ -23,6 +21,7 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="name" Type="nvarchar(max)" Nullable="false" />
           <Property Name="device_type" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="privacy_type" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="lock" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="device">
@@ -67,6 +66,12 @@
           <Property Name="stack_trace" Type="nvarchar(max)" />
           <Property Name="time_stamp" Type="bigint" Nullable="false" />
         </EntityType>
+        <EntityType Name="privacy">
+          <Key>
+            <PropertyRef Name="type" />
+          </Key>
+          <Property Name="type" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
         <EntityType Name="release">
           <Key>
             <PropertyRef Name="id" />
@@ -101,20 +106,17 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="account_id" Type="varchar(max)" Nullable="false" />
+          <Property Name="id" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="role" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="password" Type="varchar(max)" Nullable="false" />
           <Property Name="lock" Type="bit" Nullable="false" />
         </EntityType>
-        <!--產生期間發現錯誤:
-警告 6002: 資料表/檢視 'AppStore.dbo.user_application' 未定義主索引鍵。已推斷此索引鍵，並將定義建立成唯讀的資料表/檢視。-->
         <EntityType Name="user_application">
           <Key>
-            <PropertyRef Name="user_id" />
-            <PropertyRef Name="application_id" />
+            <PropertyRef Name="id" />
           </Key>
-          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_id" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="application_id" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="user_role">
@@ -132,6 +134,18 @@
             </Principal>
             <Dependent Role="application">
               <PropertyRef Name="device_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_application_privacy">
+          <End Role="privacy" Type="Self.privacy" Multiplicity="1" />
+          <End Role="application" Type="Self.application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="privacy">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="application">
+              <PropertyRef Name="privacy_type" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -280,30 +294,24 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="AppStoreModelStoreContainer">
+          <EntitySet Name="action" EntityType="Self.action" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="application" EntityType="Self.application" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="device" EntityType="Self.device" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="environment" EntityType="Self.environment" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="icon" EntityType="Self.icon" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="mobile_crash" EntityType="Self.mobile_crash" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="privacy" EntityType="Self.privacy" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="release" EntityType="Self.release" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tracking" EntityType="Self.tracking" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user" EntityType="Self.user" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="user_application" EntityType="Self.user_application" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user_role" EntityType="Self.user_role" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="action" EntityType="Self.action" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [action].[application_id] AS [application_id], 
-    [action].[id] AS [id], 
-    [action].[note] AS [note]
-    FROM [dbo].[action] AS [action]</DefiningQuery>
-          </EntitySet>
-          <EntitySet Name="user_application" EntityType="Self.user_application" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [user_application].[user_id] AS [user_id], 
-    [user_application].[application_id] AS [application_id]
-    FROM [dbo].[user_application] AS [user_application]</DefiningQuery>
-          </EntitySet>
           <AssociationSet Name="FK_application_device" Association="Self.FK_application_device">
             <End Role="device" EntitySet="device" />
+            <End Role="application" EntitySet="application" />
+          </AssociationSet>
+          <AssociationSet Name="FK_application_privacy" Association="Self.FK_application_privacy">
+            <End Role="privacy" EntitySet="privacy" />
             <End Role="application" EntitySet="application" />
           </AssociationSet>
           <AssociationSet Name="FK_mobile_crash_application" Association="Self.FK_mobile_crash_application">
@@ -360,18 +368,24 @@
     <edmx:ConceptualModels>
       <Schema Namespace="AppStoreModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="AppStoreEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="action" EntityType="AppStoreModel.action" />
           <EntitySet Name="application" EntityType="AppStoreModel.application" />
           <EntitySet Name="device" EntityType="AppStoreModel.device" />
           <EntitySet Name="environment" EntityType="AppStoreModel.environment" />
           <EntitySet Name="icon" EntityType="AppStoreModel.icon" />
           <EntitySet Name="mobile_crash" EntityType="AppStoreModel.mobile_crash" />
+          <EntitySet Name="privacy" EntityType="AppStoreModel.privacy" />
           <EntitySet Name="release" EntityType="AppStoreModel.release" />
           <EntitySet Name="tracking" EntityType="AppStoreModel.tracking" />
           <EntitySet Name="user" EntityType="AppStoreModel.user" />
+          <EntitySet Name="user_application" EntityType="AppStoreModel.user_application" />
           <EntitySet Name="user_role" EntityType="AppStoreModel.user_role" />
-          <EntitySet Name="action" EntityType="AppStoreModel.action" />
           <AssociationSet Name="FK_application_device" Association="AppStoreModel.FK_application_device">
             <End Role="device" EntitySet="device" />
+            <End Role="application" EntitySet="application" />
+          </AssociationSet>
+          <AssociationSet Name="FK_application_privacy" Association="AppStoreModel.FK_application_privacy">
+            <End Role="privacy" EntitySet="privacy" />
             <End Role="application" EntitySet="application" />
           </AssociationSet>
           <AssociationSet Name="FK_mobile_crash_application" Association="AppStoreModel.FK_mobile_crash_application">
@@ -385,6 +399,10 @@
           <AssociationSet Name="FK_tracking_application" Association="AppStoreModel.FK_tracking_application">
             <End Role="application" EntitySet="application" />
             <End Role="tracking" EntitySet="tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_user_application_application" Association="AppStoreModel.FK_user_application_application">
+            <End Role="application" EntitySet="application" />
+            <End Role="user_application" EntitySet="user_application" />
           </AssociationSet>
           <AssociationSet Name="FK_mobile_crash_device" Association="AppStoreModel.FK_mobile_crash_device">
             <End Role="device" EntitySet="device" />
@@ -410,15 +428,24 @@
             <End Role="icon" EntitySet="icon" />
             <End Role="release" EntitySet="release" />
           </AssociationSet>
+          <AssociationSet Name="FK_user_application_user" Association="AppStoreModel.FK_user_application_user">
+            <End Role="user" EntitySet="user" />
+            <End Role="user_application" EntitySet="user_application" />
+          </AssociationSet>
           <AssociationSet Name="FK_user_user_role" Association="AppStoreModel.FK_user_user_role">
             <End Role="user_role" EntitySet="user_role" />
             <End Role="user" EntitySet="user" />
           </AssociationSet>
-          <AssociationSet Name="user_application" Association="AppStoreModel.user_application">
-            <End Role="application" EntitySet="application" />
-            <End Role="user" EntitySet="user" />
-          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="action">
+          <Key>
+            <PropertyRef Name="auto_id" />
+          </Key>
+          <Property Name="auto_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="application_id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="note" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
         <EntityType Name="application">
           <Key>
             <PropertyRef Name="id" />
@@ -426,12 +453,14 @@
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="device_type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="privacy_type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="lock" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="device" Relationship="AppStoreModel.FK_application_device" FromRole="application" ToRole="device" />
+          <NavigationProperty Name="privacy" Relationship="AppStoreModel.FK_application_privacy" FromRole="application" ToRole="privacy" />
           <NavigationProperty Name="mobile_crash" Relationship="AppStoreModel.FK_mobile_crash_application" FromRole="application" ToRole="mobile_crash" />
           <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_application" FromRole="application" ToRole="release" />
           <NavigationProperty Name="tracking" Relationship="AppStoreModel.FK_tracking_application" FromRole="application" ToRole="tracking" />
-          <NavigationProperty Name="user" Relationship="AppStoreModel.user_application" FromRole="application" ToRole="user" />
+          <NavigationProperty Name="user_application" Relationship="AppStoreModel.FK_user_application_application" FromRole="application" ToRole="user_application" />
         </EntityType>
         <EntityType Name="device">
           <Key>
@@ -485,6 +514,13 @@
           <NavigationProperty Name="device" Relationship="AppStoreModel.FK_mobile_crash_device" FromRole="mobile_crash" ToRole="device" />
           <NavigationProperty Name="environment" Relationship="AppStoreModel.FK_mobile_crash_environment" FromRole="mobile_crash" ToRole="environment" />
         </EntityType>
+        <EntityType Name="privacy">
+          <Key>
+            <PropertyRef Name="type" />
+          </Key>
+          <Property Name="type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="application" Relationship="AppStoreModel.FK_application_privacy" FromRole="privacy" ToRole="application" />
+        </EntityType>
         <EntityType Name="release">
           <Key>
             <PropertyRef Name="id" />
@@ -525,13 +561,22 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="account_id" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="id" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="role" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="password" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="lock" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="user_application" Relationship="AppStoreModel.FK_user_application_user" FromRole="user" ToRole="user_application" />
           <NavigationProperty Name="user_role" Relationship="AppStoreModel.FK_user_user_role" FromRole="user" ToRole="user_role" />
-          <NavigationProperty Name="application" Relationship="AppStoreModel.user_application" FromRole="user" ToRole="application" />
+        </EntityType>
+        <EntityType Name="user_application">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="application_id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="application" Relationship="AppStoreModel.FK_user_application_application" FromRole="user_application" ToRole="application" />
+          <NavigationProperty Name="user" Relationship="AppStoreModel.FK_user_application_user" FromRole="user_application" ToRole="user" />
         </EntityType>
         <EntityType Name="user_role">
           <Key>
@@ -539,15 +584,6 @@
           </Key>
           <Property Name="type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="user" Relationship="AppStoreModel.FK_user_user_role" FromRole="user_role" ToRole="user" />
-        </EntityType>
-        <EntityType Name="action">
-          <Key>
-            <PropertyRef Name="application_id" />
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="application_id" Type="Int32" Nullable="false" />
-          <Property Name="id" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="note" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_application_device">
           <End Type="AppStoreModel.device" Role="device" Multiplicity="1" />
@@ -558,6 +594,18 @@
             </Principal>
             <Dependent Role="application">
               <PropertyRef Name="device_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_application_privacy">
+          <End Type="AppStoreModel.privacy" Role="privacy" Multiplicity="1" />
+          <End Type="AppStoreModel.application" Role="application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="privacy">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="application">
+              <PropertyRef Name="privacy_type" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -593,6 +641,18 @@
               <PropertyRef Name="id" />
             </Principal>
             <Dependent Role="tracking">
+              <PropertyRef Name="application_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_user_application_application">
+          <End Type="AppStoreModel.application" Role="application" Multiplicity="1" />
+          <End Type="AppStoreModel.user_application" Role="user_application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="application">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user_application">
               <PropertyRef Name="application_id" />
             </Dependent>
           </ReferentialConstraint>
@@ -669,6 +729,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_user_application_user">
+          <End Type="AppStoreModel.user" Role="user" Multiplicity="1" />
+          <End Type="AppStoreModel.user_application" Role="user_application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user_application">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_user_user_role">
           <End Type="AppStoreModel.user_role" Role="user_role" Multiplicity="1" />
           <End Type="AppStoreModel.user" Role="user" Multiplicity="*" />
@@ -681,20 +753,27 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="user_application">
-          <End Type="AppStoreModel.application" Role="application" Multiplicity="*" />
-          <End Type="AppStoreModel.user" Role="user" Multiplicity="*" />
-        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="AppStoreModelStoreContainer" CdmEntityContainer="AppStoreEntities">
+          <EntitySetMapping Name="action">
+            <EntityTypeMapping TypeName="AppStoreModel.action">
+              <MappingFragment StoreEntitySet="action">
+                <ScalarProperty Name="note" ColumnName="note" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="application_id" ColumnName="application_id" />
+                <ScalarProperty Name="auto_id" ColumnName="auto_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="application">
             <EntityTypeMapping TypeName="AppStoreModel.application">
               <MappingFragment StoreEntitySet="application">
                 <ScalarProperty Name="lock" ColumnName="lock" />
+                <ScalarProperty Name="privacy_type" ColumnName="privacy_type" />
                 <ScalarProperty Name="device_type" ColumnName="device_type" />
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="id" ColumnName="id" />
@@ -747,6 +826,13 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="privacy">
+            <EntityTypeMapping TypeName="AppStoreModel.privacy">
+              <MappingFragment StoreEntitySet="privacy">
+                <ScalarProperty Name="type" ColumnName="type" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="release">
             <EntityTypeMapping TypeName="AppStoreModel.release">
               <MappingFragment StoreEntitySet="release">
@@ -785,7 +871,15 @@
                 <ScalarProperty Name="lock" ColumnName="lock" />
                 <ScalarProperty Name="password" ColumnName="password" />
                 <ScalarProperty Name="role" ColumnName="role" />
-                <ScalarProperty Name="account_id" ColumnName="account_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="user_application">
+            <EntityTypeMapping TypeName="AppStoreModel.user_application">
+              <MappingFragment StoreEntitySet="user_application">
+                <ScalarProperty Name="application_id" ColumnName="application_id" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -797,23 +891,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="action">
-            <EntityTypeMapping TypeName="AppStoreModel.action">
-              <MappingFragment StoreEntitySet="action">
-                <ScalarProperty Name="note" ColumnName="note" />
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="application_id" ColumnName="application_id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <AssociationSetMapping Name="user_application" TypeName="AppStoreModel.user_application" StoreEntitySet="user_application">
-            <EndProperty Name="user">
-              <ScalarProperty Name="id" ColumnName="user_id" />
-            </EndProperty>
-            <EndProperty Name="application">
-              <ScalarProperty Name="id" ColumnName="application_id" />
-            </EndProperty>
-          </AssociationSetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

@@ -14,20 +14,21 @@ namespace AppStore.Models
     
     public partial class user
     {
+    	partial void Initialize();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public user()
         {
-            this.application = new HashSet<application>();
+            this.user_application = new HashSet<user_application>();
+    		Initialize();
         }
     
-        public int id { get; set; }
-        public string account_id { get; set; }
+        public string id { get; set; }
         public string role { get; set; }
         public string password { get; set; }
         public bool @lock { get; set; }
     
-        public virtual user_role user_role { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<application> application { get; set; }
+        public virtual ICollection<user_application> user_application { get; set; }
+        public virtual user_role user_role { get; set; }
     }
 }

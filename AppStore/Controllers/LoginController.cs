@@ -1,4 +1,5 @@
-﻿using AppStore.Helpers;
+﻿using AppStore.DAO;
+using AppStore.Helpers;
 using AppStore.Models;
 using JWT;
 using JWT.Algorithms;
@@ -20,11 +21,11 @@ namespace AppStore.Controllers
         [HttpPost]
         public IHttpActionResult Post(user user)
         {
-            if (null != user && null != user.account_id && null != user.password)
+            if (null != user && null != user.id && null != user.password)
             {
                 // 這裡可以修改成為與後端資料庫內的使用者資料表進行比對
-                user searchUser = (from dbUser in db.user where user.account_id == dbUser.account_id select dbUser).SingleOrDefault();
-                if (null != searchUser && searchUser.password == user.password)
+                user searchUser = UserDAO.getUser(db, user.id, user.password);
+                if (null != searchUser)
                 {
                     string secretKey = MainHelper.SecretKey;
                     //設定該存取權杖的有效期限
@@ -37,7 +38,7 @@ namespace AppStore.Controllers
                     var jwtToken = new JwtBuilder()
                           .WithAlgorithm(new HMACSHA256Algorithm())
                           .WithSecret(secretKey)
-                          .AddClaim("iss", searchUser.account_id)
+                          .AddClaim("iss", searchUser.id)
                           .AddClaim("exp", secondsSinceEpoch)
                           .AddClaim("role", new string[] { searchUser.role.Trim() }) //new string[] { "user", "People" }
                           .Build();

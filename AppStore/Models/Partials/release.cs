@@ -68,8 +68,6 @@ namespace AppStore.Models
             [JsonIgnore]
             public virtual application application { get; set; }
             [JsonIgnore]
-            public virtual device device { get; set; }
-            [JsonIgnore]
             public virtual environment environment { get; set; }
             [JsonIgnore]
             public virtual icon icon { get; set; }

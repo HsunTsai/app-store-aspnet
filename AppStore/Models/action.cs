@@ -14,6 +14,8 @@ namespace AppStore.Models
     
     public partial class action
     {
+    	partial void Initialize();
+        public int auto_id { get; set; }
         public int application_id { get; set; }
         public string id { get; set; }
         public string note { get; set; }

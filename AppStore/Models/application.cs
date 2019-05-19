@@ -14,21 +14,25 @@ namespace AppStore.Models
     
     public partial class application
     {
+    	partial void Initialize();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public application()
         {
             this.mobile_crash = new HashSet<mobile_crash>();
             this.release = new HashSet<release>();
             this.tracking = new HashSet<tracking>();
-            this.user = new HashSet<user>();
+            this.user_application = new HashSet<user_application>();
+    		Initialize();
         }
     
         public int id { get; set; }
         public string name { get; set; }
         public string device_type { get; set; }
+        public string privacy_type { get; set; }
         public bool @lock { get; set; }
     
         public virtual device device { get; set; }
+        public virtual privacy privacy { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<mobile_crash> mobile_crash { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -36,6 +40,6 @@ namespace AppStore.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tracking> tracking { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<user> user { get; set; }
+        public virtual ICollection<user_application> user_application { get; set; }
     }
 }

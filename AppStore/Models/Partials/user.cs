@@ -9,13 +9,11 @@ namespace AppStore.Models
     {
         public class userMetadata
         {
-            public int id { get; set; }
-
             /// <summary>
             /// 帳號
             /// </summary>
             [Display(Name = "帳號")]
-            public string account_id { get; set; }
+            public string id { get; set; }
 
             /// <summary>
             /// 權限
@@ -39,7 +37,7 @@ namespace AppStore.Models
             public virtual user_role user_role { get; set; }
             [JsonIgnore]
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-            public virtual ICollection<application> application { get; set; }
+            public virtual ICollection<user_application> user_application { get; set; }
         }
     }
 }

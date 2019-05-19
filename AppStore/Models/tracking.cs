@@ -14,6 +14,7 @@ namespace AppStore.Models
     
     public partial class tracking
     {
+    	partial void Initialize();
         public int id { get; set; }
         public int application_id { get; set; }
         public string environment_type { get; set; }

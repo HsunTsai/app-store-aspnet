@@ -26,6 +26,7 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 <#=codeStringGenerator.UsingDirectives(inHeader: false)#>
 <#=codeStringGenerator.EntityClassOpening(entity)#>
 {
+	partial void Initialize();
 <#
     var propertiesWithDefaultValues = typeMapper.GetPropertiesWithDefaultValues(entity);
     var collectionNavigationProperties = typeMapper.GetCollectionNavigationProperties(entity);
@@ -59,6 +60,7 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 <#
         }
 #>
+		Initialize();
     }
 
 <#
