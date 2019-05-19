@@ -10,7 +10,7 @@ using AppStore.Utils;
 
 namespace AppStore.Controllers
 {
-    public class usersController : ApiController
+    public class UsersController : ApiController
     {
         private AppStoreEntities db = new AppStoreEntities();
 

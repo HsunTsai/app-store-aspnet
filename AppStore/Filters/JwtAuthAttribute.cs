@@ -5,10 +5,13 @@ using JWT.Algorithms;
 using JWT.Builder;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Net.Http.Headers;
 using System.Security.Principal;
 using System.Web;
 using System.Web.Http;
@@ -33,8 +36,27 @@ namespace AppStore.Filters
 
         public override void OnAuthorization(HttpActionContext actionContext)
         {
-            // TODO: key應該移至config
-            if (actionContext.Request.Headers.Authorization == null || actionContext.Request.Headers.Authorization.Scheme != "Bearer")
+            string jwtToken = null;
+            #region 進行存取權杖的解碼(Authorization Header)
+            AuthenticationHeaderValue authorization = actionContext.Request.Headers.Authorization;
+            if (null == authorization || authorization.Scheme != "Bearer")
+            {
+                #region 進行存取權杖的解碼(Cookie)
+                CookieHeaderValue cookies = actionContext.Request.Headers.GetCookies("jwt").FirstOrDefault();
+                if (null != cookies && !string.IsNullOrEmpty(cookies["jwt"].Value))
+                {
+                    jwtToken = cookies["jwt"].Value;
+                }
+                #endregion
+            }
+            else
+            {
+                jwtToken = authorization.Parameter;
+            }
+            #endregion
+
+
+            if (null == jwtToken)
             {
                 setErrorResponse(actionContext, "token miss");  //沒有看到存取權杖錯誤
             }
@@ -42,18 +64,14 @@ namespace AppStore.Filters
             {
                 try
                 {
-                    //#region 進行存取權杖的解碼(Cookie)
-                    //....
-                    //#endregion
-                    var aaa = actionContext.Request.Headers.GetCookies();
-                    aaa.ToString();
+
                     #region 進行存取權杖的解碼(Header)
                     string secretKey = MainHelper.SecretKey;
                     var json = new JwtBuilder()
                         .WithAlgorithm(new HMACSHA256Algorithm())
                         .WithSecret(secretKey)
                         .MustVerifySignature()
-                        .Decode<Dictionary<string, object>>(actionContext.Request.Headers.Authorization.Parameter);
+                        .Decode<Dictionary<string, object>>(jwtToken);
                     #endregion
 
                     #region 將存取權杖所夾帶的內容取出來

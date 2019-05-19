@@ -30,8 +30,16 @@ namespace AppStore.Models
             public bool @lock { get; set; } = false;
 
             [JsonIgnore]
+            public virtual device device { get; set; }
+            [JsonIgnore]
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+            public virtual ICollection<mobile_crash> mobile_crash { get; set; }
+            [JsonIgnore]
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
             public virtual ICollection<release> release { get; set; }
+            [JsonIgnore]
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+            public virtual ICollection<tracking> tracking { get; set; }
             [JsonIgnore]
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
             public virtual ICollection<user> user { get; set; }

@@ -18,11 +18,17 @@ namespace AppStore.Models
         public device()
         {
             this.application = new HashSet<application>();
+            this.mobile_crash = new HashSet<mobile_crash>();
+            this.tracking = new HashSet<tracking>();
         }
     
         public string type { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<application> application { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<mobile_crash> mobile_crash { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tracking> tracking { get; set; }
     }
 }

@@ -11,7 +11,7 @@ using AppStore.Models;
 namespace AppStore.Controllers
 {
     [JwtAuth]
-    //[Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin")]
     public class applicationsController : ApiController
     {
         private AppStoreEntities db = new AppStoreEntities();

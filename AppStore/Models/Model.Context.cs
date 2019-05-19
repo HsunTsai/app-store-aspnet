@@ -29,8 +29,11 @@ namespace AppStore.Models
         public virtual DbSet<device> device { get; set; }
         public virtual DbSet<environment> environment { get; set; }
         public virtual DbSet<icon> icon { get; set; }
+        public virtual DbSet<mobile_crash> mobile_crash { get; set; }
         public virtual DbSet<release> release { get; set; }
+        public virtual DbSet<tracking> tracking { get; set; }
         public virtual DbSet<user> user { get; set; }
         public virtual DbSet<user_role> user_role { get; set; }
+        public virtual DbSet<action> action { get; set; }
     }
 }

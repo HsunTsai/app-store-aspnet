@@ -5,6 +5,17 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="AppStoreModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <!--產生期間發現錯誤:
+警告 6002: 資料表/檢視 'AppStore.dbo.action' 未定義主索引鍵。已推斷此索引鍵，並將定義建立成唯讀的資料表/檢視。-->
+        <EntityType Name="action">
+          <Key>
+            <PropertyRef Name="application_id" />
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="application_id" Type="int" Nullable="false" />
+          <Property Name="id" Type="varchar(max)" Nullable="false" />
+          <Property Name="note" Type="nvarchar(max)" />
+        </EntityType>
         <EntityType Name="application">
           <Key>
             <PropertyRef Name="id" />
@@ -34,6 +45,28 @@
           <Property Name="path" Type="varchar(max)" Nullable="false" />
           <Property Name="application_id" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="mobile_crash">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="application_id" Type="int" Nullable="false" />
+          <Property Name="device_type" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="device_id" Type="varchar(max)" />
+          <Property Name="device_brand" Type="nvarchar(max)" />
+          <Property Name="device_manufacturer" Type="nvarchar(max)" />
+          <Property Name="device_model" Type="nvarchar(max)" />
+          <Property Name="device_version" Type="nvarchar(max)" />
+          <Property Name="device_version_api" Type="int" />
+          <Property Name="user_id" Type="nvarchar(max)" />
+          <Property Name="environment_type" Type="varchar" MaxLength="12" />
+          <Property Name="app_version" Type="nvarchar(max)" />
+          <Property Name="app_version_code" Type="int" />
+          <Property Name="place" Type="nvarchar(max)" />
+          <Property Name="reason" Type="nvarchar(max)" />
+          <Property Name="stack_trace" Type="nvarchar(max)" />
+          <Property Name="time_stamp" Type="bigint" Nullable="false" />
+        </EntityType>
         <EntityType Name="release">
           <Key>
             <PropertyRef Name="id" />
@@ -48,6 +81,21 @@
           <Property Name="size" Type="bigint" Nullable="false" />
           <Property Name="force_update" Type="bit" Nullable="false" />
           <Property Name="lock" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tracking">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="application_id" Type="int" Nullable="false" />
+          <Property Name="environment_type" Type="varchar" MaxLength="12" Nullable="false" />
+          <Property Name="device_type" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="device_id" Type="varchar(max)" />
+          <Property Name="user_id" Type="nvarchar(max)" />
+          <Property Name="action_id" Type="varchar(max)" />
+          <Property Name="param" Type="nvarchar(max)" />
+          <Property Name="detail" Type="nvarchar(max)" />
+          <Property Name="time_stamp" Type="bigint" Nullable="false" />
         </EntityType>
         <EntityType Name="user">
           <Key>
@@ -87,6 +135,42 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_mobile_crash_application">
+          <End Role="application" Type="Self.application" Multiplicity="1" />
+          <End Role="mobile_crash" Type="Self.mobile_crash" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="application">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="mobile_crash">
+              <PropertyRef Name="application_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_mobile_crash_device">
+          <End Role="device" Type="Self.device" Multiplicity="1" />
+          <End Role="mobile_crash" Type="Self.mobile_crash" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="mobile_crash">
+              <PropertyRef Name="device_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_mobile_crash_environment">
+          <End Role="environment" Type="Self.environment" Multiplicity="0..1" />
+          <End Role="mobile_crash" Type="Self.mobile_crash" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="environment">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="mobile_crash">
+              <PropertyRef Name="environment_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_release_application">
           <End Role="application" Type="Self.application" Multiplicity="1" />
           <End Role="release" Type="Self.release" Multiplicity="*" />
@@ -120,6 +204,42 @@
             </Principal>
             <Dependent Role="release">
               <PropertyRef Name="icon_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tracking_application">
+          <End Role="application" Type="Self.application" Multiplicity="1" />
+          <End Role="tracking" Type="Self.tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="application">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tracking">
+              <PropertyRef Name="application_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tracking_device">
+          <End Role="device" Type="Self.device" Multiplicity="1" />
+          <End Role="tracking" Type="Self.tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="tracking">
+              <PropertyRef Name="device_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tracking_environment">
+          <End Role="environment" Type="Self.environment" Multiplicity="1" />
+          <End Role="tracking" Type="Self.tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="environment">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="tracking">
+              <PropertyRef Name="environment_type" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -164,9 +284,18 @@
           <EntitySet Name="device" EntityType="Self.device" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="environment" EntityType="Self.environment" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="icon" EntityType="Self.icon" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="mobile_crash" EntityType="Self.mobile_crash" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="release" EntityType="Self.release" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tracking" EntityType="Self.tracking" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user" EntityType="Self.user" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user_role" EntityType="Self.user_role" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="action" EntityType="Self.action" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [action].[application_id] AS [application_id], 
+    [action].[id] AS [id], 
+    [action].[note] AS [note]
+    FROM [dbo].[action] AS [action]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="user_application" EntityType="Self.user_application" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [user_application].[user_id] AS [user_id], 
@@ -176,6 +305,18 @@
           <AssociationSet Name="FK_application_device" Association="Self.FK_application_device">
             <End Role="device" EntitySet="device" />
             <End Role="application" EntitySet="application" />
+          </AssociationSet>
+          <AssociationSet Name="FK_mobile_crash_application" Association="Self.FK_mobile_crash_application">
+            <End Role="application" EntitySet="application" />
+            <End Role="mobile_crash" EntitySet="mobile_crash" />
+          </AssociationSet>
+          <AssociationSet Name="FK_mobile_crash_device" Association="Self.FK_mobile_crash_device">
+            <End Role="device" EntitySet="device" />
+            <End Role="mobile_crash" EntitySet="mobile_crash" />
+          </AssociationSet>
+          <AssociationSet Name="FK_mobile_crash_environment" Association="Self.FK_mobile_crash_environment">
+            <End Role="environment" EntitySet="environment" />
+            <End Role="mobile_crash" EntitySet="mobile_crash" />
           </AssociationSet>
           <AssociationSet Name="FK_release_application" Association="Self.FK_release_application">
             <End Role="application" EntitySet="application" />
@@ -188,6 +329,18 @@
           <AssociationSet Name="FK_release_icon" Association="Self.FK_release_icon">
             <End Role="icon" EntitySet="icon" />
             <End Role="release" EntitySet="release" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tracking_application" Association="Self.FK_tracking_application">
+            <End Role="application" EntitySet="application" />
+            <End Role="tracking" EntitySet="tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tracking_device" Association="Self.FK_tracking_device">
+            <End Role="device" EntitySet="device" />
+            <End Role="tracking" EntitySet="tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tracking_environment" Association="Self.FK_tracking_environment">
+            <End Role="environment" EntitySet="environment" />
+            <End Role="tracking" EntitySet="tracking" />
           </AssociationSet>
           <AssociationSet Name="FK_user_application_application" Association="Self.FK_user_application_application">
             <End Role="application" EntitySet="application" />
@@ -211,20 +364,47 @@
           <EntitySet Name="device" EntityType="AppStoreModel.device" />
           <EntitySet Name="environment" EntityType="AppStoreModel.environment" />
           <EntitySet Name="icon" EntityType="AppStoreModel.icon" />
+          <EntitySet Name="mobile_crash" EntityType="AppStoreModel.mobile_crash" />
           <EntitySet Name="release" EntityType="AppStoreModel.release" />
+          <EntitySet Name="tracking" EntityType="AppStoreModel.tracking" />
           <EntitySet Name="user" EntityType="AppStoreModel.user" />
           <EntitySet Name="user_role" EntityType="AppStoreModel.user_role" />
+          <EntitySet Name="action" EntityType="AppStoreModel.action" />
           <AssociationSet Name="FK_application_device" Association="AppStoreModel.FK_application_device">
             <End Role="device" EntitySet="device" />
             <End Role="application" EntitySet="application" />
+          </AssociationSet>
+          <AssociationSet Name="FK_mobile_crash_application" Association="AppStoreModel.FK_mobile_crash_application">
+            <End Role="application" EntitySet="application" />
+            <End Role="mobile_crash" EntitySet="mobile_crash" />
           </AssociationSet>
           <AssociationSet Name="FK_release_application" Association="AppStoreModel.FK_release_application">
             <End Role="application" EntitySet="application" />
             <End Role="release" EntitySet="release" />
           </AssociationSet>
+          <AssociationSet Name="FK_tracking_application" Association="AppStoreModel.FK_tracking_application">
+            <End Role="application" EntitySet="application" />
+            <End Role="tracking" EntitySet="tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_mobile_crash_device" Association="AppStoreModel.FK_mobile_crash_device">
+            <End Role="device" EntitySet="device" />
+            <End Role="mobile_crash" EntitySet="mobile_crash" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tracking_device" Association="AppStoreModel.FK_tracking_device">
+            <End Role="device" EntitySet="device" />
+            <End Role="tracking" EntitySet="tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_mobile_crash_environment" Association="AppStoreModel.FK_mobile_crash_environment">
+            <End Role="environment" EntitySet="environment" />
+            <End Role="mobile_crash" EntitySet="mobile_crash" />
+          </AssociationSet>
           <AssociationSet Name="FK_release_environment" Association="AppStoreModel.FK_release_environment">
             <End Role="environment" EntitySet="environment" />
             <End Role="release" EntitySet="release" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tracking_environment" Association="AppStoreModel.FK_tracking_environment">
+            <End Role="environment" EntitySet="environment" />
+            <End Role="tracking" EntitySet="tracking" />
           </AssociationSet>
           <AssociationSet Name="FK_release_icon" Association="AppStoreModel.FK_release_icon">
             <End Role="icon" EntitySet="icon" />
@@ -248,7 +428,9 @@
           <Property Name="device_type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="lock" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="device" Relationship="AppStoreModel.FK_application_device" FromRole="application" ToRole="device" />
+          <NavigationProperty Name="mobile_crash" Relationship="AppStoreModel.FK_mobile_crash_application" FromRole="application" ToRole="mobile_crash" />
           <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_application" FromRole="application" ToRole="release" />
+          <NavigationProperty Name="tracking" Relationship="AppStoreModel.FK_tracking_application" FromRole="application" ToRole="tracking" />
           <NavigationProperty Name="user" Relationship="AppStoreModel.user_application" FromRole="application" ToRole="user" />
         </EntityType>
         <EntityType Name="device">
@@ -257,13 +439,17 @@
           </Key>
           <Property Name="type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="application" Relationship="AppStoreModel.FK_application_device" FromRole="device" ToRole="application" />
+          <NavigationProperty Name="mobile_crash" Relationship="AppStoreModel.FK_mobile_crash_device" FromRole="device" ToRole="mobile_crash" />
+          <NavigationProperty Name="tracking" Relationship="AppStoreModel.FK_tracking_device" FromRole="device" ToRole="tracking" />
         </EntityType>
         <EntityType Name="environment">
           <Key>
             <PropertyRef Name="type" />
           </Key>
           <Property Name="type" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="mobile_crash" Relationship="AppStoreModel.FK_mobile_crash_environment" FromRole="environment" ToRole="mobile_crash" />
           <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_environment" FromRole="environment" ToRole="release" />
+          <NavigationProperty Name="tracking" Relationship="AppStoreModel.FK_tracking_environment" FromRole="environment" ToRole="tracking" />
         </EntityType>
         <EntityType Name="icon">
           <Key>
@@ -273,6 +459,31 @@
           <Property Name="path" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="application_id" Type="Int32" Nullable="false" />
           <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_icon" FromRole="icon" ToRole="release" />
+        </EntityType>
+        <EntityType Name="mobile_crash">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="application_id" Type="Int32" Nullable="false" />
+          <Property Name="device_type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="device_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="device_brand" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="device_manufacturer" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="device_model" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="device_version" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="device_version_api" Type="Int32" />
+          <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="environment_type" Type="String" MaxLength="12" FixedLength="false" Unicode="false" />
+          <Property Name="app_version" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="app_version_code" Type="Int32" />
+          <Property Name="place" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="reason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="stack_trace" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="time_stamp" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="application" Relationship="AppStoreModel.FK_mobile_crash_application" FromRole="mobile_crash" ToRole="application" />
+          <NavigationProperty Name="device" Relationship="AppStoreModel.FK_mobile_crash_device" FromRole="mobile_crash" ToRole="device" />
+          <NavigationProperty Name="environment" Relationship="AppStoreModel.FK_mobile_crash_environment" FromRole="mobile_crash" ToRole="environment" />
         </EntityType>
         <EntityType Name="release">
           <Key>
@@ -291,6 +502,24 @@
           <NavigationProperty Name="application" Relationship="AppStoreModel.FK_release_application" FromRole="release" ToRole="application" />
           <NavigationProperty Name="environment" Relationship="AppStoreModel.FK_release_environment" FromRole="release" ToRole="environment" />
           <NavigationProperty Name="icon" Relationship="AppStoreModel.FK_release_icon" FromRole="release" ToRole="icon" />
+        </EntityType>
+        <EntityType Name="tracking">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="application_id" Type="Int32" Nullable="false" />
+          <Property Name="environment_type" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="false" />
+          <Property Name="device_type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="device_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="user_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="action_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="param" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="detail" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="time_stamp" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="application" Relationship="AppStoreModel.FK_tracking_application" FromRole="tracking" ToRole="application" />
+          <NavigationProperty Name="device" Relationship="AppStoreModel.FK_tracking_device" FromRole="tracking" ToRole="device" />
+          <NavigationProperty Name="environment" Relationship="AppStoreModel.FK_tracking_environment" FromRole="tracking" ToRole="environment" />
         </EntityType>
         <EntityType Name="user">
           <Key>
@@ -311,6 +540,15 @@
           <Property Name="type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="user" Relationship="AppStoreModel.FK_user_user_role" FromRole="user_role" ToRole="user" />
         </EntityType>
+        <EntityType Name="action">
+          <Key>
+            <PropertyRef Name="application_id" />
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="application_id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="note" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
         <Association Name="FK_application_device">
           <End Type="AppStoreModel.device" Role="device" Multiplicity="1" />
           <End Type="AppStoreModel.application" Role="application" Multiplicity="*" />
@@ -320,6 +558,18 @@
             </Principal>
             <Dependent Role="application">
               <PropertyRef Name="device_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_mobile_crash_application">
+          <End Type="AppStoreModel.application" Role="application" Multiplicity="1" />
+          <End Type="AppStoreModel.mobile_crash" Role="mobile_crash" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="application">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="mobile_crash">
+              <PropertyRef Name="application_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -335,6 +585,54 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_tracking_application">
+          <End Type="AppStoreModel.application" Role="application" Multiplicity="1" />
+          <End Type="AppStoreModel.tracking" Role="tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="application">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tracking">
+              <PropertyRef Name="application_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_mobile_crash_device">
+          <End Type="AppStoreModel.device" Role="device" Multiplicity="1" />
+          <End Type="AppStoreModel.mobile_crash" Role="mobile_crash" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="mobile_crash">
+              <PropertyRef Name="device_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tracking_device">
+          <End Type="AppStoreModel.device" Role="device" Multiplicity="1" />
+          <End Type="AppStoreModel.tracking" Role="tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="tracking">
+              <PropertyRef Name="device_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_mobile_crash_environment">
+          <End Type="AppStoreModel.environment" Role="environment" Multiplicity="0..1" />
+          <End Type="AppStoreModel.mobile_crash" Role="mobile_crash" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="environment">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="mobile_crash">
+              <PropertyRef Name="environment_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_release_environment">
           <End Type="AppStoreModel.environment" Role="environment" Multiplicity="1" />
           <End Type="AppStoreModel.release" Role="release" Multiplicity="*" />
@@ -343,6 +641,18 @@
               <PropertyRef Name="type" />
             </Principal>
             <Dependent Role="release">
+              <PropertyRef Name="environment_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tracking_environment">
+          <End Type="AppStoreModel.environment" Role="environment" Multiplicity="1" />
+          <End Type="AppStoreModel.tracking" Role="tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="environment">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="tracking">
               <PropertyRef Name="environment_type" />
             </Dependent>
           </ReferentialConstraint>
@@ -414,6 +724,29 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="mobile_crash">
+            <EntityTypeMapping TypeName="AppStoreModel.mobile_crash">
+              <MappingFragment StoreEntitySet="mobile_crash">
+                <ScalarProperty Name="time_stamp" ColumnName="time_stamp" />
+                <ScalarProperty Name="stack_trace" ColumnName="stack_trace" />
+                <ScalarProperty Name="reason" ColumnName="reason" />
+                <ScalarProperty Name="place" ColumnName="place" />
+                <ScalarProperty Name="app_version_code" ColumnName="app_version_code" />
+                <ScalarProperty Name="app_version" ColumnName="app_version" />
+                <ScalarProperty Name="environment_type" ColumnName="environment_type" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="device_version_api" ColumnName="device_version_api" />
+                <ScalarProperty Name="device_version" ColumnName="device_version" />
+                <ScalarProperty Name="device_model" ColumnName="device_model" />
+                <ScalarProperty Name="device_manufacturer" ColumnName="device_manufacturer" />
+                <ScalarProperty Name="device_brand" ColumnName="device_brand" />
+                <ScalarProperty Name="device_id" ColumnName="device_id" />
+                <ScalarProperty Name="device_type" ColumnName="device_type" />
+                <ScalarProperty Name="application_id" ColumnName="application_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="release">
             <EntityTypeMapping TypeName="AppStoreModel.release">
               <MappingFragment StoreEntitySet="release">
@@ -424,6 +757,22 @@
                 <ScalarProperty Name="notes" ColumnName="notes" />
                 <ScalarProperty Name="version_code" ColumnName="version_code" />
                 <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="environment_type" ColumnName="environment_type" />
+                <ScalarProperty Name="application_id" ColumnName="application_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tracking">
+            <EntityTypeMapping TypeName="AppStoreModel.tracking">
+              <MappingFragment StoreEntitySet="tracking">
+                <ScalarProperty Name="time_stamp" ColumnName="time_stamp" />
+                <ScalarProperty Name="detail" ColumnName="detail" />
+                <ScalarProperty Name="param" ColumnName="param" />
+                <ScalarProperty Name="action_id" ColumnName="action_id" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="device_id" ColumnName="device_id" />
+                <ScalarProperty Name="device_type" ColumnName="device_type" />
                 <ScalarProperty Name="environment_type" ColumnName="environment_type" />
                 <ScalarProperty Name="application_id" ColumnName="application_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
@@ -445,6 +794,15 @@
             <EntityTypeMapping TypeName="AppStoreModel.user_role">
               <MappingFragment StoreEntitySet="user_role">
                 <ScalarProperty Name="type" ColumnName="type" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="action">
+            <EntityTypeMapping TypeName="AppStoreModel.action">
+              <MappingFragment StoreEntitySet="action">
+                <ScalarProperty Name="note" ColumnName="note" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="application_id" ColumnName="application_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
