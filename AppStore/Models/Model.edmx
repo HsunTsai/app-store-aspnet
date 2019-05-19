@@ -118,6 +118,13 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="user_id" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="application_id" Type="int" Nullable="false" />
+          <Property Name="role" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="user_application_role">
+          <Key>
+            <PropertyRef Name="type" />
+          </Key>
+          <Property Name="type" Type="varchar" MaxLength="10" Nullable="false" />
         </EntityType>
         <EntityType Name="user_role">
           <Key>
@@ -281,6 +288,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_user_application_user_application_role">
+          <End Role="user_application_role" Type="Self.user_application_role" Multiplicity="1" />
+          <End Role="user_application" Type="Self.user_application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user_application_role">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="user_application">
+              <PropertyRef Name="role" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_user_user_role">
           <End Role="user_role" Type="Self.user_role" Multiplicity="1" />
           <End Role="user" Type="Self.user" Multiplicity="*" />
@@ -305,6 +324,7 @@
           <EntitySet Name="tracking" EntityType="Self.tracking" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user" EntityType="Self.user" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user_application" EntityType="Self.user_application" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="user_application_role" EntityType="Self.user_application_role" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user_role" EntityType="Self.user_role" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_application_device" Association="Self.FK_application_device">
             <End Role="device" EntitySet="device" />
@@ -358,6 +378,10 @@
             <End Role="user" EntitySet="user" />
             <End Role="user_application" EntitySet="user_application" />
           </AssociationSet>
+          <AssociationSet Name="FK_user_application_user_application_role" Association="Self.FK_user_application_user_application_role">
+            <End Role="user_application_role" EntitySet="user_application_role" />
+            <End Role="user_application" EntitySet="user_application" />
+          </AssociationSet>
           <AssociationSet Name="FK_user_user_role" Association="Self.FK_user_user_role">
             <End Role="user_role" EntitySet="user_role" />
             <End Role="user" EntitySet="user" />
@@ -379,6 +403,7 @@
           <EntitySet Name="tracking" EntityType="AppStoreModel.tracking" />
           <EntitySet Name="user" EntityType="AppStoreModel.user" />
           <EntitySet Name="user_application" EntityType="AppStoreModel.user_application" />
+          <EntitySet Name="user_application_role" EntityType="AppStoreModel.user_application_role" />
           <EntitySet Name="user_role" EntityType="AppStoreModel.user_role" />
           <AssociationSet Name="FK_application_device" Association="AppStoreModel.FK_application_device">
             <End Role="device" EntitySet="device" />
@@ -435,6 +460,10 @@
           <AssociationSet Name="FK_user_user_role" Association="AppStoreModel.FK_user_user_role">
             <End Role="user_role" EntitySet="user_role" />
             <End Role="user" EntitySet="user" />
+          </AssociationSet>
+          <AssociationSet Name="FK_user_application_user_application_role" Association="AppStoreModel.FK_user_application_user_application_role">
+            <End Role="user_application_role" EntitySet="user_application_role" />
+            <End Role="user_application" EntitySet="user_application" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="action">
@@ -575,8 +604,17 @@
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="user_id" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="application_id" Type="Int32" Nullable="false" />
+          <Property Name="role" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="application" Relationship="AppStoreModel.FK_user_application_application" FromRole="user_application" ToRole="application" />
           <NavigationProperty Name="user" Relationship="AppStoreModel.FK_user_application_user" FromRole="user_application" ToRole="user" />
+          <NavigationProperty Name="user_application_role" Relationship="AppStoreModel.FK_user_application_user_application_role" FromRole="user_application" ToRole="user_application_role" />
+        </EntityType>
+        <EntityType Name="user_application_role">
+          <Key>
+            <PropertyRef Name="type" />
+          </Key>
+          <Property Name="type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="user_application" Relationship="AppStoreModel.FK_user_application_user_application_role" FromRole="user_application_role" ToRole="user_application" />
         </EntityType>
         <EntityType Name="user_role">
           <Key>
@@ -753,6 +791,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_user_application_user_application_role">
+          <End Type="AppStoreModel.user_application_role" Role="user_application_role" Multiplicity="1" />
+          <End Type="AppStoreModel.user_application" Role="user_application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user_application_role">
+              <PropertyRef Name="type" />
+            </Principal>
+            <Dependent Role="user_application">
+              <PropertyRef Name="role" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -878,9 +928,17 @@
           <EntitySetMapping Name="user_application">
             <EntityTypeMapping TypeName="AppStoreModel.user_application">
               <MappingFragment StoreEntitySet="user_application">
+                <ScalarProperty Name="role" ColumnName="role" />
                 <ScalarProperty Name="application_id" ColumnName="application_id" />
                 <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="user_application_role">
+            <EntityTypeMapping TypeName="AppStoreModel.user_application_role">
+              <MappingFragment StoreEntitySet="user_application_role">
+                <ScalarProperty Name="type" ColumnName="type" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

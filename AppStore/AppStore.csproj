@@ -237,6 +237,9 @@
     <Compile Include="Models\user_application.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\user_application_role.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\user_role.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

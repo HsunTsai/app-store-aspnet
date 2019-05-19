@@ -34,17 +34,13 @@ namespace AppStore.Models
             /// </summary>
             [Display(Name = "該應用程式是否公開")]
             //private string _privacy_type = "public";
-            public string privacy_type { get; set; } = "public";
-            //{
-            //    get { return _privacy_type; }
-            //    set { _privacy_type = value; }
-            //}
+            public string privacy_type { get; set; }
 
             /// <summary>
             /// 是否將應用程式關閉或下架
             /// </summary>
             [Display(Name = "是否將應用程式關閉或下架")]
-            public bool @lock { get; set; } = false;
+            public bool @lock { get; set; }
 
             [JsonIgnore]
             public virtual device device { get; set; }

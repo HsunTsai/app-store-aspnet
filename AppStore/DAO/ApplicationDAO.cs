@@ -24,10 +24,6 @@ namespace AppStore.DAO
                 {
                     conditionApps += (" id = " + userApp.id);
                 }
-                //var aaa = db.application.Where(app => appIDs.Contains(app.id));
-                //var bbb = (from dbApps in db.application where appIDs.Contains(dbApps.id) select dbApps).ToList();
-                //return (from dbApps in db.application where appIDs.Contains(dbApps.id) select dbApps).ToList();
-                //return db.application.Where(app => appIDs.Contains(app.id)).SelectMany();
 
                 return db.Database.SqlQuery<application>(
                     "SELECT id,name,device_type,privacy_type,lock " +
@@ -43,6 +39,12 @@ namespace AppStore.DAO
         public static application get(AppStoreEntities db, int id)
         {
             return (from dbAPPs in db.application where dbAPPs.id == id select dbAPPs).SingleOrDefault();
+        }
+
+        public static bool isAuth(AppStoreEntities db, string user_id, int application_id)
+        {
+            user_application user_Application = (from dbApps in db.user_application where user_id == dbApps.user_id && application_id == dbApps.application_id select dbApps).SingleOrDefault();
+            return null != user_Application && user_Application.role == "manager";
         }
     }
 }

@@ -82,15 +82,6 @@ namespace AppStore.Controllers
             return Ok(new HttpMessage("create_succeed").toString());
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
         private bool userExists(string id)
         {
             return db.user.Count(e => e.id == id) > 0;

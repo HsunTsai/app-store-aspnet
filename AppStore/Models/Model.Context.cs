@@ -36,6 +36,7 @@ namespace AppStore.Models
         public virtual DbSet<tracking> tracking { get; set; }
         public virtual DbSet<user> user { get; set; }
         public virtual DbSet<user_application> user_application { get; set; }
+        public virtual DbSet<user_application_role> user_application_role { get; set; }
         public virtual DbSet<user_role> user_role { get; set; }
     }
 }

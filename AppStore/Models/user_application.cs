@@ -18,8 +18,10 @@ namespace AppStore.Models
         public int id { get; set; }
         public string user_id { get; set; }
         public int application_id { get; set; }
+        public string role { get; set; }
     
         public virtual application application { get; set; }
         public virtual user user { get; set; }
+        public virtual user_application_role user_application_role { get; set; }
     }
 }
