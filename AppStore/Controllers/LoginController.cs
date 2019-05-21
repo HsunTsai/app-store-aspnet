@@ -13,7 +13,7 @@ using System.Web.Http;
 
 namespace AppStore.Controllers
 {
-    public class LoginController : ApiController
+    public class loginController : ApiController
     {
         private IHttpActionResult response;
         private AppStoreEntities db = new AppStoreEntities();

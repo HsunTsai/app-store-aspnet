@@ -9,7 +9,7 @@ using System.Web.Http;
 
 namespace AppStore.Controllers
 {
-    public class LogoutController : ApiController
+    public class logoutController : ApiController
     {
         [HttpGet]
         public IHttpActionResult Get()

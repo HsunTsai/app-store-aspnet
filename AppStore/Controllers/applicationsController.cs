@@ -5,6 +5,7 @@ using System.Web.Http.Description;
 using AppStore.DAO;
 using AppStore.Filters;
 using AppStore.Models;
+using AppStore.Services;
 using AppStore.Utils;
 
 namespace AppStore.Controllers
@@ -12,20 +13,6 @@ namespace AppStore.Controllers
     public class applicationsController : ApiController
     {
         private AppStoreEntities db = new AppStoreEntities();
-
-        // GET: api/trackings/type
-        [ResponseType(typeof(tracking))]
-        public IHttpActionResult Getapplication(string type)
-        {
-            switch (type)
-            {
-                case "all":
-                    return Ok(ApplicationDAO.getPublicApp(db));
-                default:
-                    return BadRequest("type not match");
-
-            }
-        }
 
         // GET: api/applications
         [ResponseType(typeof(application))]
@@ -48,7 +35,7 @@ namespace AppStore.Controllers
 
             string user_id = Request.Properties["user"] as string;
 
-            if (ApplicationDAO.isAuth(db, user_id, application.id))
+            if (Service.isApplicationCanModify(db, user_id, application.id))
             {
                 application searchApp = ApplicationDAO.get(db, application.id);
                 if (null != application.privacy_type) searchApp.privacy_type = application.privacy_type;

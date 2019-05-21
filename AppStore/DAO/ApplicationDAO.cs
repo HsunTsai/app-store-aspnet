@@ -9,9 +9,11 @@ namespace AppStore.DAO
 {
     public class ApplicationDAO
     {
+        
+
         public static List<application> getPublicApp(AppStoreEntities db)
         {
-            return (from dbAPPs in db.application where dbAPPs.privacy_type == "public" select dbAPPs).ToList();
+            return (from dbAPPs in db.application where dbAPPs.privacy_type == "public" && dbAPPs.@lock == false select dbAPPs).ToList();
         }
 
         public static List<application> getUserApp(AppStoreEntities db, string user_id)
@@ -39,12 +41,6 @@ namespace AppStore.DAO
         public static application get(AppStoreEntities db, int id)
         {
             return (from dbAPPs in db.application where dbAPPs.id == id select dbAPPs).SingleOrDefault();
-        }
-
-        public static bool isAuth(AppStoreEntities db, string user_id, int application_id)
-        {
-            user_application user_Application = (from dbApps in db.user_application where user_id == dbApps.user_id && application_id == dbApps.application_id select dbApps).SingleOrDefault();
-            return null != user_Application && user_Application.role == "manager";
         }
     }
 }
