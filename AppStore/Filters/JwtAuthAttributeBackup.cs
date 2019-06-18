@@ -1,6 +1,5 @@
 ﻿using AppStore.Helpers;
 using AppStore.Models;
-using AppStore.Services;
 using JWT;
 using JWT.Algorithms;
 using JWT.Builder;
@@ -23,8 +22,6 @@ namespace AppStore.Filters
     public class JwtAuthAttribute : AuthorizeAttribute
     {
         public string ErrorMessage { get; set; } = "";
-        private AppStoreEntities db = new AppStoreEntities();
-
         protected override void HandleUnauthorizedRequest(HttpActionContext actionContext)
         {
             if (string.IsNullOrEmpty(ErrorMessage) == false)
@@ -80,47 +77,45 @@ namespace AppStore.Filters
                     #region 將存取權杖所夾帶的內容取出來
                     var fooRole = json["role"] as Newtonsoft.Json.Linq.JArray;
                     var fooRoleList = fooRole.Select(x => (string)x).ToList<string>();
-                    string fooUserId = json["iss"] as string;
                     #endregion
 
                     #region 將存取權杖的夾帶欄位，儲存到 HTTP 要求的屬性
-                    actionContext.Request.Properties.Add("user", fooUserId);
+                    actionContext.Request.Properties.Add("user", json["iss"] as string);
                     actionContext.Request.Properties.Add("role", fooRoleList);
                     #endregion
 
                     #region 設定目前 HTTP 要求的安全性資訊
                     var fooPrincipal =
-                        new GenericPrincipal(new GenericIdentity(fooUserId, "MyPassport"), fooRoleList.ToArray());
+                        new GenericPrincipal(new GenericIdentity(json["iss"] as string, "MyPassport"), fooRoleList.ToArray());
                     if (HttpContext.Current != null)
                     {
                         HttpContext.Current.User = fooPrincipal;
                     }
                     #endregion
 
-                    #region 檢查user id是否存在
-                    if (string.IsNullOrEmpty(fooUserId))
-                    {
-                        setErrorResponse(actionContext, "no user"); //無使用者id
-                    }
-                    #endregion
-
                     #region 角色權限檢查(檢查控制器或動作之屬性(Attribute上設的 Roles的設定內容)
-                    //if (!string.IsNullOrEmpty(Roles))
-                    //{
-                    //    string[] roles = Roles.Split(',');
-                    //    switch (roles[0])
-                    //    {
-                    //        case "application":
-                    //            string application_id = HttpContext.Current.Request.Params["id"];
-                    //            string userApplicationRole = Service.userApplicationRole(db, fooUserId, int.Parse(application_id));
-                    //            if (!roles.Contains(userApplicationRole))
-                    //            {
-                    //                setErrorResponse(actionContext, "role error"); //無效的角色設定，沒有權限使用這個 API
-                    //            }
-                    //            break;
-                            
-                    //    }
-                    //}
+                    if (string.IsNullOrEmpty(Roles) == false)
+                    {
+                        // 是否有找到匹配的角色設定
+                        bool fooCheckRoleResult = false;
+                        // 切割成為多個角色成員
+                        var fooConditionRoles = Roles.Split(',');
+                        // 逐一檢查，這個使用用者是否有在這個角色條件中
+                        foreach (var item in fooConditionRoles)
+                        {
+                            var fooInRole = fooPrincipal.IsInRole(item.Trim());
+                            if (fooInRole == true)
+                            {
+                                fooCheckRoleResult = true;
+                                break;
+                            }
+                        }
+
+                        if (fooCheckRoleResult == false)
+                        {
+                            setErrorResponse(actionContext, "role error"); //無效的角色設定，沒有權限使用這個 API
+                        }
+                    }
                     #endregion
 
                 }

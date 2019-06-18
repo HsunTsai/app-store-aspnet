@@ -24,7 +24,7 @@ namespace AppStore.Controllers
             if (null != user && null != user.id && null != user.password)
             {
                 // 這裡可以修改成為與後端資料庫內的使用者資料表進行比對
-                user searchUser = UserDAO.getUser(db, user.id, user.password);
+                user searchUser = UserDAO.userVerify(db, user.id, user.password);
                 if (null != searchUser)
                 {
                     string secretKey = MainHelper.SecretKey;

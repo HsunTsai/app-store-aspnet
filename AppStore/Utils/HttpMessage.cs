@@ -5,15 +5,17 @@ namespace AppStore.Utils
     public class HttpMessage
     {
         JObject message = new JObject();
+        string message_id;
 
         public HttpMessage(string message_id)
         {
-            message.Add("message", message_id);
+            this.message_id = message_id;
+            message.Add("Message", message_id);
         }
 
-        public string toString()
+        public JObject toJson()
         {
-            return  message.ToString();
+            return message;
         }
     }
 }

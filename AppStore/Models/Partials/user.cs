@@ -25,6 +25,7 @@ namespace AppStore.Models
             /// 密碼
             /// </summary>
             [Display(Name = "密碼")]
+            [Required]
             public string password { get; set; }
 
             /// <summary>

@@ -8,7 +8,12 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
+using AppStore.DAO;
+using AppStore.Filters;
 using AppStore.Models;
+using AppStore.Services;
+using AppStore.Utils;
+using Newtonsoft.Json.Linq;
 
 namespace AppStore.Controllers
 {
@@ -16,103 +21,43 @@ namespace AppStore.Controllers
     {
         private AppStoreEntities db = new AppStoreEntities();
 
-        // GET: api/trackings
-        public IQueryable<tracking> Gettracking()
-        {
-            return db.tracking;
-        }
-
-        // GET: api/trackings/5
+        // GET: api/trackings/{application_id}
         [ResponseType(typeof(tracking))]
-        public IHttpActionResult Gettracking(int id)
+        [JwtAuth]
+        public IHttpActionResult Gettracking(int id, [FromUri()]int offset, [FromUri()]int count)
         {
-            tracking tracking = db.tracking.Find(id);
-            if (tracking == null)
+            string user_id = Request.Properties["user"] as string;
+            if (Service.isApplicationCanRead(db, user_id, id))
             {
-                return NotFound();
+                List<tracking> trackingList = TrackingDAO.getTrackingList(db, id, offset, count);
+                return Ok(trackingList);
             }
-
-            return Ok(tracking);
-        }
-
-        // PUT: api/trackings/5
-        [ResponseType(typeof(void))]
-        public IHttpActionResult Puttracking(int id, tracking tracking)
-        {
-            if (!ModelState.IsValid)
+            else
             {
-                return BadRequest(ModelState);
+                return Content(HttpStatusCode.Unauthorized, new HttpMessage("insufficient_user_rights").toJson());
             }
-
-            if (id != tracking.id)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(tracking).State = EntityState.Modified;
-
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!trackingExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
         }
 
         // POST: api/trackings
         [ResponseType(typeof(tracking))]
-        public IHttpActionResult Posttracking(tracking tracking)
+        public IHttpActionResult Posttracking(tracking[] trackings)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            foreach (tracking tracking in trackings)
             {
-                return BadRequest(ModelState);
+                //若端傳送的action id後端沒有相對應值 則預設為9999
+                List<action> appActionList = ActionDAO.getApplicationActions(db, tracking.application_id);
+                if (appActionList.Count(e => e.action_id == tracking.action_id) == 0) tracking.action_id = 9999;
+                db.tracking.Add(tracking);
             }
 
-            db.tracking.Add(tracking);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = tracking.id }, tracking);
-        }
+            JObject message = new JObject();
+            message.Add("messgae", trackings.Length + " items already insert");
 
-        // DELETE: api/trackings/5
-        [ResponseType(typeof(tracking))]
-        public IHttpActionResult Deletetracking(int id)
-        {
-            tracking tracking = db.tracking.Find(id);
-            if (tracking == null)
-            {
-                return NotFound();
-            }
-
-            db.tracking.Remove(tracking);
-            db.SaveChanges();
-
-            return Ok(tracking);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
-        private bool trackingExists(int id)
-        {
-            return db.tracking.Count(e => e.id == id) > 0;
+            return Ok(message);
         }
     }
 }

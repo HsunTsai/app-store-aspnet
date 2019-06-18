@@ -21,12 +21,12 @@ namespace AppStore.Controllers
         {
             if (Service.isApplicationRublic(db, id))
             {
-                List<release> releaseApps = ReleaseDAO.getAppRelease(db, id);
+                List<release> releaseApps = ReleaseDAO.getReleaseList(db, id);
                 return Ok(releaseApps);
             }
             else
             {
-                return BadRequest(new HttpMessage("application_lock_private_notexist").toString());
+                return Content(HttpStatusCode.Unauthorized, new HttpMessage("application_not_public").toJson());
             }
         }
     }

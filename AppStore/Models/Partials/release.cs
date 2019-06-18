@@ -18,6 +18,12 @@ namespace AppStore.Models
             public int application_id { get; set; }
 
             /// <summary>
+            /// 該應用程式所屬設備(Android iOS win32 win64)
+            /// </summary>
+            [Display(Name = "該應用程式所屬設備(Android iOS win32 win64)")]
+            public string device_type { get; set; }
+
+            /// <summary>
             /// 該釋出的版本所在的環境
             /// </summary>
             [Display(Name = "該釋出的版本所在的環境")]
@@ -64,6 +70,12 @@ namespace AppStore.Models
             /// </summary>
             [Display(Name = "開啟或關閉該版本")]
             public bool @lock { get; set; }
+
+            /// <summary>
+            /// 釋出版本的時間戳記
+            /// </summary>
+            [Display(Name = "釋出版本的時間戳記")]
+            public long release_time { get; set; }
 
             [JsonIgnore]
             public virtual application application { get; set; }

@@ -24,12 +24,6 @@ namespace AppStore.Models
             public string name { get; set; }
 
             /// <summary>
-            /// 該應用程式所屬設備(Android iOS win32 win64)
-            /// </summary>
-            [Display(Name = "該應用程式所屬設備(Android iOS win32 win64)")]
-            public string device_type { get; set; }
-
-            /// <summary>
             /// 該應用程式隱私(pivate or public)
             /// </summary>
             [Display(Name = "該應用程式是否公開")]
@@ -41,9 +35,7 @@ namespace AppStore.Models
             /// </summary>
             [Display(Name = "是否將應用程式關閉或下架")]
             public bool @lock { get; set; }
-
-            [JsonIgnore]
-            public virtual device device { get; set; }
+            
             [JsonIgnore]
             public virtual privacy privacy { get; set; }
             [JsonIgnore]

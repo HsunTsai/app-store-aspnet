@@ -27,11 +27,9 @@ namespace AppStore.Models
     
         public int id { get; set; }
         public string name { get; set; }
-        public string device_type { get; set; }
         public string privacy_type { get; set; }
         public bool @lock { get; set; }
     
-        public virtual device device { get; set; }
         public virtual privacy privacy { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<mobile_crash> mobile_crash { get; set; }

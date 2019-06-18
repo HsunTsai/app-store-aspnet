@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
 using System.Linq;
+using System.Net;
 using System.Web.Http;
 using System.Web.Http.Description;
 using AppStore.DAO;
@@ -20,7 +21,7 @@ namespace AppStore.Controllers
         public IHttpActionResult Getapplication()
         {
             string user_id = Request.Properties["user"] as string;
-            return Ok(ApplicationDAO.getUserApp(db, user_id));
+            return Ok(ApplicationDAO.getUserApps(db, user_id));
         }
 
         // PUT: api/applications
@@ -28,27 +29,26 @@ namespace AppStore.Controllers
         [JwtAuth]
         public IHttpActionResult Putapplication(application application)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            // 檢查Model的狀態
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             string user_id = Request.Properties["user"] as string;
-
+            application searchApp = ApplicationDAO.get(db, application.id);
+            if (null == searchApp) return NotFound();
+            
             if (Service.isApplicationCanModify(db, user_id, application.id))
             {
-                application searchApp = ApplicationDAO.get(db, application.id);
                 if (null != application.privacy_type) searchApp.privacy_type = application.privacy_type;
                 searchApp.@lock = application.@lock;
 
                 db.Entry(searchApp).State = EntityState.Modified;
                 db.SaveChanges();
 
-                return Ok(new HttpMessage("update_succeed"));
+                return Ok(searchApp);
             }
             else
             {
-                return Unauthorized();
+                return Content(HttpStatusCode.Unauthorized, new HttpMessage("insufficient_user_rights").toJson());
             }
         }
 
@@ -57,12 +57,10 @@ namespace AppStore.Controllers
         [JwtAuth]
         public IHttpActionResult Postapplication(application application)
         {
-            string user_id = Request.Properties["user"] as string;
+            // 檢查Model的狀態
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            string user_id = Request.Properties["user"] as string;
 
             db.application.Add(application);
             //把自己建的APP跟自己建立關聯
@@ -75,24 +73,23 @@ namespace AppStore.Controllers
         // DELETE: api/applications
         [ResponseType(typeof(application))]
         [JwtAuth]
-        [Authorize(Roles = "admin")]
         public IHttpActionResult Deleteapplication(application application)
         {
-            application app = db.application.Find(application.id);
-            if (app == null)
+            string user_id = Request.Properties["user"] as string;
+            application searchApp = ApplicationDAO.get(db, application.id);
+            if (searchApp == null) return NotFound();
+            
+            if (Service.isApplicationCanModify(db, user_id, application.id))
             {
-                return NotFound();
+                db.application.Remove(searchApp);
+                db.SaveChanges();
+
+                return Ok(searchApp);
             }
-
-            db.application.Remove(app);
-            db.SaveChanges();
-
-            return Ok(application);
-        }
-
-        private bool applicationExists(int id)
-        {
-            return db.application.Count(e => e.id == id) > 0;
+            else
+            {
+                return Content(HttpStatusCode.Unauthorized, new HttpMessage("insufficient_user_rights").toJson());
+            }
         }
     }
 }

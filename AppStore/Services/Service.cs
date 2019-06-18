@@ -8,16 +8,34 @@ namespace AppStore.Services
 {
     public class Service
     {
-        public static bool isApplicationCanModify(AppStoreEntities db, string user_id, int application_id)
+        //取得使用者對於APP的權限
+        public static string userApplicationRole(AppStoreEntities db, string user_id, int application_id)
         {
             user_application user_Application = (from dbApps in db.user_application where user_id == dbApps.user_id && application_id == dbApps.application_id select dbApps).SingleOrDefault();
-            return null != user_Application && user_Application.role == "manager";
+            return null == user_Application ? "" : user_Application.role;
         }
 
+        //public static string userAppStoreRole(AppStoreEntities db, string user_id)
+        //{
+        //    user user = (from users in db.user where user_id == users.id select users).SingleOrDefault();
+        //    return null == user ? "" : user.role;
+        //}
+
+        //public static bool isApplicationInRole(AppStoreEntities db, string user_id, int application_id, string[] roles)
+        //{
+        //    return roles.Contains(userApplicationRole(db, user_id, application_id));
+        //}
+
+        //使用者是否可以讀取APP的資料
         public static bool isApplicationCanRead(AppStoreEntities db, string user_id, int application_id)
         {
-            user_application user_Application = (from dbApps in db.user_application where user_id == dbApps.user_id && application_id == dbApps.application_id select dbApps).SingleOrDefault();
-            return null != user_Application && (user_Application.role == "manager" || user_Application.role == "user");
+            return userApplicationRole(db, user_id, application_id) == "manager" || userApplicationRole(db, user_id, application_id) == "user";
+        }
+
+        //使用者是否可以修改APP的資料
+        public static bool isApplicationCanModify(AppStoreEntities db, string user_id, int application_id)
+        {
+            return userApplicationRole(db, user_id, application_id) == "manager";
         }
 
         //依照APPID尋找公開且沒被上鎖的APP是否存在

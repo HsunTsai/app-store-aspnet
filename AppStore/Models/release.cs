@@ -17,6 +17,7 @@ namespace AppStore.Models
     	partial void Initialize();
         public int id { get; set; }
         public int application_id { get; set; }
+        public string device_type { get; set; }
         public string environment_type { get; set; }
         public string version { get; set; }
         public int version_code { get; set; }
@@ -25,6 +26,7 @@ namespace AppStore.Models
         public long size { get; set; }
         public bool force_update { get; set; }
         public bool @lock { get; set; }
+        public long release_time { get; set; }
     
         public virtual application application { get; set; }
         public virtual environment environment { get; set; }

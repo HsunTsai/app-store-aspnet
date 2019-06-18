@@ -21,7 +21,7 @@ namespace AppStore.Models
         public string device_type { get; set; }
         public string device_id { get; set; }
         public string user_id { get; set; }
-        public string action_id { get; set; }
+        public Nullable<int> action_id { get; set; }
         public string param { get; set; }
         public string detail { get; set; }
         public long time_stamp { get; set; }

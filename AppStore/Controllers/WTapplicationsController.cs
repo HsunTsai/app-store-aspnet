@@ -14,7 +14,7 @@ namespace AppStore.Controllers
     {
         private AppStoreEntities db = new AppStoreEntities();
 
-        // GET: api/applications/type
+        // GET: api/applications
         [ResponseType(typeof(application))]
         public IHttpActionResult Getapplication()
         {
