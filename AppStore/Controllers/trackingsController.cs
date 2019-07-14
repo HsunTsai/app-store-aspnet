@@ -24,12 +24,12 @@ namespace AppStore.Controllers
         // GET: api/trackings/{application_id}
         [ResponseType(typeof(tracking))]
         [JwtAuth]
-        public IHttpActionResult Gettracking(int id, [FromUri()]int offset, [FromUri()]int count)
+        public IHttpActionResult Gettracking([FromUri()] int application_id, [FromUri()] int offset, [FromUri()] int count)
         {
             string user_id = Request.Properties["user"] as string;
-            if (Service.isApplicationCanRead(db, user_id, id))
+            if (Service.isApplicationCanRead(db, user_id, application_id))
             {
-                List<tracking> trackingList = TrackingDAO.getTrackingList(db, id, offset, count);
+                List<tracking> trackingList = TrackingDAO.getTrackingList(db, application_id, offset, count);
                 return Ok(trackingList);
             }
             else
@@ -49,6 +49,7 @@ namespace AppStore.Controllers
                 //若端傳送的action id後端沒有相對應值 則預設為9999
                 List<action> appActionList = ActionDAO.getApplicationActions(db, tracking.application_id);
                 if (appActionList.Count(e => e.action_id == tracking.action_id) == 0) tracking.action_id = 9999;
+                if (tracking.time_stamp == 0) tracking.time_stamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 db.tracking.Add(tracking);
             }
 

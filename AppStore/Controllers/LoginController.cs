@@ -62,25 +62,25 @@ namespace AppStore.Controllers
                 else
                 {
                     // 帳號與密碼比對不正確，回傳帳密比對不正確
-                    response = Ok(new APIResult()
+                    var response = Request.CreateResponse(HttpStatusCode.BadRequest, new APIResult()
                     {
                         success = false,
                         message = "Account or Password error", //帳號或密碼不正確
                         payload = ""
                     });
+                    return ResponseMessage(response);
                 }
-                return response;
             }
             else
             {
                 // 沒有收到正確格式的 Authorization 內容，回傳無法驗證訊息
-                response = Ok(new APIResult()
+                var response = Request.CreateResponse(HttpStatusCode.BadRequest, new APIResult()
                 {
                     success = false,
                     message = "Account or Password should not be null", //帳號或密碼不得為空值
                     payload = ""
                 });
-                return response;
+                return ResponseMessage(response);
             }
         }
     }

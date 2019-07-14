@@ -45,34 +45,25 @@ namespace AppStore.Controllers
         public IHttpActionResult Putrelease(release release)
         {
             // 檢查Model的狀態
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            //if (!ModelState.IsValid) return BadRequest(ModelState);
 
             string user_id = Request.Properties["user"] as string;
             if (Service.isApplicationCanModify(db, user_id, release.application_id))
             {
                 release releaseApp = ReleaseDAO.getSingleRelease(db, release.id);
-                if (null == releaseApp)
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    try
-                    {
-                        if (null != release.environment_type) releaseApp.environment_type = release.environment_type;
-                        if (null != release.notes) releaseApp.notes = release.notes;
-                        releaseApp.icon_id = release.icon_id;
-                        releaseApp.force_update = release.force_update;
-                        releaseApp.@lock = release.@lock;
+                if (null == releaseApp) return NotFound();
 
-                        db.Entry(releaseApp).State = EntityState.Modified;
-                        db.SaveChanges();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        throw;
-                    }
-                }
+                // ios不得切換環境 因ios走得上板規則與其他不同
+                if (null != release.environment_type && !releaseApp.device_type.Trim().Equals("ios"))
+                    releaseApp.environment_type = release.environment_type;
+                if (null != release.notes) releaseApp.notes = release.notes;
+                releaseApp.icon_id = release.icon_id;
+                releaseApp.force_update = release.force_update;
+                releaseApp.@lock = release.@lock;
+
+                db.Entry(releaseApp).State = EntityState.Modified;
+                db.SaveChanges();
+
                 return Ok(releaseApp);
             }
             else

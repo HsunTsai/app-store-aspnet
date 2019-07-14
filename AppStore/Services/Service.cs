@@ -1,4 +1,5 @@
-﻿using AppStore.Models;
+﻿using AppStore.DAO;
+using AppStore.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,12 +30,16 @@ namespace AppStore.Services
         //使用者是否可以讀取APP的資料
         public static bool isApplicationCanRead(AppStoreEntities db, string user_id, int application_id)
         {
+            user user = UserDAO.getUser(db, user_id);
+            if (user.role.Trim().Equals("admin")) return true;
             return userApplicationRole(db, user_id, application_id) == "manager" || userApplicationRole(db, user_id, application_id) == "user";
         }
 
         //使用者是否可以修改APP的資料
         public static bool isApplicationCanModify(AppStoreEntities db, string user_id, int application_id)
         {
+            user user = UserDAO.getUser(db, user_id);
+            if (user.role.Trim().Equals("admin")) return true;
             return userApplicationRole(db, user_id, application_id) == "manager";
         }
 
