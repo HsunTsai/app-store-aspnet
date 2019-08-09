@@ -4,6 +4,8 @@ using AppStore.Models;
 using JWT;
 using JWT.Algorithms;
 using JWT.Builder;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Net;
@@ -30,8 +32,8 @@ namespace AppStore.Controllers
                     string secretKey = MainHelper.SecretKey;
                     //設定該存取權杖的有效期限
                     IDateTimeProvider provider = new UtcDateTimeProvider();
-                    // 這個 Access Token只有一個小時有效
-                    var now = provider.GetNow().AddHours(1);
+                    // 這個 Access Token8個小時有效
+                    var now = provider.GetNow().AddHours(8);
                     var unixEpoch = UnixEpoch.Value; // 1970-01-01 00:00:00 UTC
                     var secondsSinceEpoch = Math.Round((now - unixEpoch).TotalSeconds);
 
@@ -48,12 +50,15 @@ namespace AppStore.Controllers
                     var cookie = new CookieHeaderValue("jwt", jwtToken);//Replace with your cookie
 
                     //Create response as usual
-                    var response = Request.CreateResponse(HttpStatusCode.OK, new APIResult()
-                    {
-                        success = true,
-                        message = "succeed",//$"帳號:{searchUser.account_id} / 密碼:{searchUser.password}",
-                        payload = $"{jwtToken}"
-                    });
+                    JObject userObject = JObject.Parse(JsonConvert.SerializeObject(searchUser));
+                    userObject.Remove("password");
+                    var response = Request.CreateResponse(HttpStatusCode.OK, userObject);
+                        //new APIResult()
+                        //{
+                        //    success = true,
+                        //    message = "succeed",//$"帳號:{searchUser.account_id} / 密碼:{searchUser.password}",
+                        //    payload = $"{jwtToken}"
+                        //});
                     response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                     response.Headers.AddCookies(new[] { cookie });
 

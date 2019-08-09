@@ -18,6 +18,7 @@ namespace AppStore.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public application()
         {
+            this.action = new HashSet<action>();
             this.mobile_crash = new HashSet<mobile_crash>();
             this.release = new HashSet<release>();
             this.tracking = new HashSet<tracking>();
@@ -27,9 +28,14 @@ namespace AppStore.Models
     
         public int id { get; set; }
         public string name { get; set; }
+        public string description { get; set; }
+        public Nullable<int> i18n_id { get; set; }
         public string privacy_type { get; set; }
         public bool @lock { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<action> action { get; set; }
+        public virtual i18n i18n { get; set; }
         public virtual privacy privacy { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<mobile_crash> mobile_crash { get; set; }

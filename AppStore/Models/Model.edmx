@@ -21,6 +21,8 @@
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="name" Type="varchar(max)" Nullable="false" />
+          <Property Name="description" Type="varchar(max)" />
+          <Property Name="i18n_id" Type="int" />
           <Property Name="privacy_type" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="lock" Type="bit" Nullable="false" />
         </EntityType>
@@ -36,13 +38,34 @@
           </Key>
           <Property Name="type" Type="varchar" MaxLength="12" Nullable="false" />
         </EntityType>
+        <EntityType Name="i18n">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="type" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <!--產生期間發現錯誤:
+警告 6002: 資料表/檢視 'AppStore.dbo.i18n_data' 未定義主索引鍵。已推斷此索引鍵，並將定義建立成唯讀的資料表/檢視。-->
+        <EntityType Name="i18n_data">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="i18n_id" />
+            <PropertyRef Name="key" />
+            <PropertyRef Name="value" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="i18n_id" Type="int" Nullable="false" />
+          <Property Name="key" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="value" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
         <EntityType Name="icon">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_id" Type="int" Nullable="false" />
           <Property Name="path" Type="varchar(max)" Nullable="false" />
-          <Property Name="application_id" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="mobile_crash">
           <Key>
@@ -134,6 +157,30 @@
           </Key>
           <Property Name="type" Type="varchar" MaxLength="10" Nullable="false" />
         </EntityType>
+        <Association Name="FK_action_application">
+          <End Role="application" Type="Self.application" Multiplicity="1" />
+          <End Role="action" Type="Self.action" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="application">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="action">
+              <PropertyRef Name="application_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_application_i18n">
+          <End Role="i18n" Type="Self.i18n" Multiplicity="0..1" />
+          <End Role="application" Type="Self.application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="i18n">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="application">
+              <PropertyRef Name="i18n_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_application_privacy">
           <End Role="privacy" Type="Self.privacy" Multiplicity="1" />
           <End Role="application" Type="Self.application" Multiplicity="*" />
@@ -143,6 +190,20 @@
             </Principal>
             <Dependent Role="application">
               <PropertyRef Name="privacy_type" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_i18n_data_i18n">
+          <End Role="i18n" Type="Self.i18n" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="i18n_data" Type="Self.i18n_data" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="i18n">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="i18n_data">
+              <PropertyRef Name="i18n_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -307,6 +368,7 @@
           <EntitySet Name="application" EntityType="Self.application" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="device" EntityType="Self.device" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="environment" EntityType="Self.environment" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="i18n" EntityType="Self.i18n" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="icon" EntityType="Self.icon" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="mobile_crash" EntityType="Self.mobile_crash" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="privacy" EntityType="Self.privacy" Schema="dbo" store:Type="Tables" />
@@ -316,9 +378,29 @@
           <EntitySet Name="user_application" EntityType="Self.user_application" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user_application_role" EntityType="Self.user_application_role" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user_role" EntityType="Self.user_role" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="i18n_data" EntityType="Self.i18n_data" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [i18n_data].[id] AS [id], 
+    [i18n_data].[i18n_id] AS [i18n_id], 
+    [i18n_data].[key] AS [key], 
+    [i18n_data].[value] AS [value]
+    FROM [dbo].[i18n_data] AS [i18n_data]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_action_application" Association="Self.FK_action_application">
+            <End Role="application" EntitySet="application" />
+            <End Role="action" EntitySet="action" />
+          </AssociationSet>
+          <AssociationSet Name="FK_application_i18n" Association="Self.FK_application_i18n">
+            <End Role="i18n" EntitySet="i18n" />
+            <End Role="application" EntitySet="application" />
+          </AssociationSet>
           <AssociationSet Name="FK_application_privacy" Association="Self.FK_application_privacy">
             <End Role="privacy" EntitySet="privacy" />
             <End Role="application" EntitySet="application" />
+          </AssociationSet>
+          <AssociationSet Name="FK_i18n_data_i18n" Association="Self.FK_i18n_data_i18n">
+            <End Role="i18n" EntitySet="i18n" />
+            <End Role="i18n_data" EntitySet="i18n_data" />
           </AssociationSet>
           <AssociationSet Name="FK_mobile_crash_application" Association="Self.FK_mobile_crash_application">
             <End Role="application" EntitySet="application" />
@@ -382,6 +464,7 @@
           <EntitySet Name="application" EntityType="AppStoreModel.application" />
           <EntitySet Name="device" EntityType="AppStoreModel.device" />
           <EntitySet Name="environment" EntityType="AppStoreModel.environment" />
+          <EntitySet Name="i18n" EntityType="AppStoreModel.i18n" />
           <EntitySet Name="icon" EntityType="AppStoreModel.icon" />
           <EntitySet Name="mobile_crash" EntityType="AppStoreModel.mobile_crash" />
           <EntitySet Name="privacy" EntityType="AppStoreModel.privacy" />
@@ -391,6 +474,15 @@
           <EntitySet Name="user_application" EntityType="AppStoreModel.user_application" />
           <EntitySet Name="user_application_role" EntityType="AppStoreModel.user_application_role" />
           <EntitySet Name="user_role" EntityType="AppStoreModel.user_role" />
+          <EntitySet Name="i18n_data" EntityType="AppStoreModel.i18n_data" />
+          <AssociationSet Name="FK_action_application" Association="AppStoreModel.FK_action_application">
+            <End Role="application" EntitySet="application" />
+            <End Role="action" EntitySet="action" />
+          </AssociationSet>
+          <AssociationSet Name="FK_application_i18n" Association="AppStoreModel.FK_application_i18n">
+            <End Role="i18n" EntitySet="i18n" />
+            <End Role="application" EntitySet="application" />
+          </AssociationSet>
           <AssociationSet Name="FK_application_privacy" Association="AppStoreModel.FK_application_privacy">
             <End Role="privacy" EntitySet="privacy" />
             <End Role="application" EntitySet="application" />
@@ -431,6 +523,10 @@
             <End Role="environment" EntitySet="environment" />
             <End Role="tracking" EntitySet="tracking" />
           </AssociationSet>
+          <AssociationSet Name="FK_i18n_data_i18n" Association="AppStoreModel.FK_i18n_data_i18n">
+            <End Role="i18n" EntitySet="i18n" />
+            <End Role="i18n_data" EntitySet="i18n_data" />
+          </AssociationSet>
           <AssociationSet Name="FK_release_icon" Association="AppStoreModel.FK_release_icon">
             <End Role="icon" EntitySet="icon" />
             <End Role="release" EntitySet="release" />
@@ -457,6 +553,7 @@
           <Property Name="action_id" Type="Int32" Nullable="false" />
           <Property Name="name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="note" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="application" Relationship="AppStoreModel.FK_action_application" FromRole="action" ToRole="application" />
         </EntityType>
         <EntityType Name="application">
           <Key>
@@ -464,8 +561,12 @@
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="i18n_id" Type="Int32" />
           <Property Name="privacy_type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="lock" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="action" Relationship="AppStoreModel.FK_action_application" FromRole="application" ToRole="action" />
+          <NavigationProperty Name="i18n" Relationship="AppStoreModel.FK_application_i18n" FromRole="application" ToRole="i18n" />
           <NavigationProperty Name="privacy" Relationship="AppStoreModel.FK_application_privacy" FromRole="application" ToRole="privacy" />
           <NavigationProperty Name="mobile_crash" Relationship="AppStoreModel.FK_mobile_crash_application" FromRole="application" ToRole="mobile_crash" />
           <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_application" FromRole="application" ToRole="release" />
@@ -489,13 +590,22 @@
           <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_environment" FromRole="environment" ToRole="release" />
           <NavigationProperty Name="tracking" Relationship="AppStoreModel.FK_tracking_environment" FromRole="environment" ToRole="tracking" />
         </EntityType>
+        <EntityType Name="i18n">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="type" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="application" Relationship="AppStoreModel.FK_application_i18n" FromRole="i18n" ToRole="application" />
+          <NavigationProperty Name="i18n_data" Relationship="AppStoreModel.FK_i18n_data_i18n" FromRole="i18n" ToRole="i18n_data" />
+        </EntityType>
         <EntityType Name="icon">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
           <Property Name="path" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="application_id" Type="Int32" Nullable="false" />
           <NavigationProperty Name="release" Relationship="AppStoreModel.FK_release_icon" FromRole="icon" ToRole="release" />
         </EntityType>
         <EntityType Name="mobile_crash">
@@ -605,6 +715,43 @@
           <Property Name="type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="user" Relationship="AppStoreModel.FK_user_user_role" FromRole="user_role" ToRole="user" />
         </EntityType>
+        <EntityType Name="i18n_data">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="i18n_id" />
+            <PropertyRef Name="key" />
+            <PropertyRef Name="value" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="i18n_id" Type="Int32" Nullable="false" />
+          <Property Name="key" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="value" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="i18n" Relationship="AppStoreModel.FK_i18n_data_i18n" FromRole="i18n_data" ToRole="i18n" />
+        </EntityType>
+        <Association Name="FK_action_application">
+          <End Type="AppStoreModel.application" Role="application" Multiplicity="1" />
+          <End Type="AppStoreModel.action" Role="action" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="application">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="action">
+              <PropertyRef Name="application_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_application_i18n">
+          <End Type="AppStoreModel.i18n" Role="i18n" Multiplicity="0..1" />
+          <End Type="AppStoreModel.application" Role="application" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="i18n">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="application">
+              <PropertyRef Name="i18n_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_application_privacy">
           <End Type="AppStoreModel.privacy" Role="privacy" Multiplicity="1" />
           <End Type="AppStoreModel.application" Role="application" Multiplicity="*" />
@@ -725,6 +872,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_i18n_data_i18n">
+          <End Type="AppStoreModel.i18n" Role="i18n" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="AppStoreModel.i18n_data" Role="i18n_data" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="i18n">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="i18n_data">
+              <PropertyRef Name="i18n_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_release_icon">
           <End Type="AppStoreModel.icon" Role="icon" Multiplicity="1" />
           <End Type="AppStoreModel.release" Role="release" Multiplicity="*" />
@@ -795,6 +956,8 @@
               <MappingFragment StoreEntitySet="application">
                 <ScalarProperty Name="lock" ColumnName="lock" />
                 <ScalarProperty Name="privacy_type" ColumnName="privacy_type" />
+                <ScalarProperty Name="i18n_id" ColumnName="i18n_id" />
+                <ScalarProperty Name="description" ColumnName="description" />
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
@@ -814,11 +977,19 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="i18n">
+            <EntityTypeMapping TypeName="AppStoreModel.i18n">
+              <MappingFragment StoreEntitySet="i18n">
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="icon">
             <EntityTypeMapping TypeName="AppStoreModel.icon">
               <MappingFragment StoreEntitySet="icon">
-                <ScalarProperty Name="application_id" ColumnName="application_id" />
                 <ScalarProperty Name="path" ColumnName="path" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -918,6 +1089,16 @@
             <EntityTypeMapping TypeName="AppStoreModel.user_role">
               <MappingFragment StoreEntitySet="user_role">
                 <ScalarProperty Name="type" ColumnName="type" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="i18n_data">
+            <EntityTypeMapping TypeName="AppStoreModel.i18n_data">
+              <MappingFragment StoreEntitySet="i18n_data">
+                <ScalarProperty Name="value" ColumnName="value" />
+                <ScalarProperty Name="key" ColumnName="key" />
+                <ScalarProperty Name="i18n_id" ColumnName="i18n_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

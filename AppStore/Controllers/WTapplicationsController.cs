@@ -1,5 +1,7 @@
 ﻿using AppStore.DAO;
 using AppStore.Models;
+using AppStore.Services;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +21,28 @@ namespace AppStore.Controllers
         public IHttpActionResult Getapplication()
         {
             return Ok(ApplicationDAO.getPublicApp(db));
+        }
+
+        // GET: api/applications/{application_id}
+        [ResponseType(typeof(application))]
+        public IHttpActionResult Getapplication(int id)
+        {
+            if (Service.isApplicationCanRead(db, "", id))
+            {
+                application app = ApplicationDAO.get(db, id);
+                if (null == app)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(app);
+                }
+            }
+            else
+            {
+                return BadRequest("can_not_read_application");
+            }
         }
     }
 }

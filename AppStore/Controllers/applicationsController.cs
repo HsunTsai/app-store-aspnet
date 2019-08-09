@@ -8,12 +8,37 @@ using AppStore.Filters;
 using AppStore.Models;
 using AppStore.Services;
 using AppStore.Utils;
+using Newtonsoft.Json.Linq;
 
 namespace AppStore.Controllers
 {
     public class applicationsController : ApiController
     {
         private AppStoreEntities db = new AppStoreEntities();
+
+        // GET: api/applications/{application_id}
+        [ResponseType(typeof(application))]
+        [JwtAuth]
+        public IHttpActionResult Getapplication(int id)
+        {
+            string user_id = Request.Properties["user"] as string;
+            if (Service.isApplicationCanRead(db, user_id, id))
+            {
+                JObject app = ApplicationDAO.get(db, id, true);
+                if (null == app)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(app);
+                }
+            }
+            else
+            {
+                return BadRequest("can_not_read_application");
+            }
+        }
 
         // GET: api/applications
         [ResponseType(typeof(application))]
@@ -35,7 +60,7 @@ namespace AppStore.Controllers
             string user_id = Request.Properties["user"] as string;
             application searchApp = ApplicationDAO.get(db, application.id);
             if (null == searchApp) return NotFound();
-            
+
             if (Service.isApplicationCanModify(db, user_id, application.id))
             {
                 if (null != application.privacy_type) searchApp.privacy_type = application.privacy_type;
@@ -78,7 +103,7 @@ namespace AppStore.Controllers
             string user_id = Request.Properties["user"] as string;
             application searchApp = ApplicationDAO.get(db, application.id);
             if (searchApp == null) return NotFound();
-            
+
             if (Service.isApplicationCanModify(db, user_id, application.id))
             {
                 db.application.Remove(searchApp);

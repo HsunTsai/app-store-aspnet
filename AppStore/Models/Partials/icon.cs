@@ -18,10 +18,10 @@ namespace AppStore.Models
             public string path { get; set; }
 
             /// <summary>
-            /// 對應應用程式id
+            /// 上傳的使用者id
             /// </summary>
-            [Display(Name = "對應應用程式id")]
-            public int application_id { get; set; }
+            [Display(Name = "上傳的使用者id")]
+            public int user_id { get; set; }
 
             [JsonIgnore]
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

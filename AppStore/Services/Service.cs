@@ -30,9 +30,16 @@ namespace AppStore.Services
         //使用者是否可以讀取APP的資料
         public static bool isApplicationCanRead(AppStoreEntities db, string user_id, int application_id)
         {
+            // 檢查APP是否是公開的或是是否上鎖
+            application app = ApplicationDAO.get(db, application_id);
+            //if (app.@lock) return false;
+            if (app.privacy_type == "public") return true;
+
+            // 如果非公開就檢查使用者權限
+            if (string.IsNullOrEmpty(user_id)) return false;
             user user = UserDAO.getUser(db, user_id);
             if (user.role.Trim().Equals("admin")) return true;
-            return userApplicationRole(db, user_id, application_id) == "manager" || userApplicationRole(db, user_id, application_id) == "user";
+            return userApplicationRole(db, user_id, application_id) == "manager" || userApplicationRole(db, user_id, application_id) == "user"; 
         }
 
         //使用者是否可以修改APP的資料

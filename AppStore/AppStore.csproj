@@ -173,6 +173,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\actionsController.cs" />
     <Compile Include="Controllers\applicationsController.cs" />
+    <Compile Include="Controllers\checkLoginController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\loginController.cs" />
     <Compile Include="Controllers\logoutController.cs" />
@@ -204,6 +205,12 @@
     <Compile Include="Models\environment.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\i18n.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\i18n_data.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\icon.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -230,6 +237,7 @@
     <Compile Include="Models\Partials\release.cs" />
     <Compile Include="Models\Partials\icon.cs" />
     <Compile Include="Models\Partials\application.cs" />
+    <Compile Include="Models\Partials\user_application.cs" />
     <Compile Include="Models\privacy.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

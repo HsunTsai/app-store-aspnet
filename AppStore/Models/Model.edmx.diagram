@@ -5,19 +5,23 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="4c128735da7b49a599682139e7ae849a" Name="Diagram1" ZoomLevel="62">
-        <EntityTypeShape EntityType="AppStoreModel.action" Width="1.5" PointX="8.75" PointY="0.75" />
-        <EntityTypeShape EntityType="AppStoreModel.application" Width="1.5" PointX="3" PointY="8.5" />
-        <EntityTypeShape EntityType="AppStoreModel.device" Width="1.5" PointX="3" PointY="2.875" />
-        <EntityTypeShape EntityType="AppStoreModel.environment" Width="1.5" PointX="3" PointY="5.125" />
-        <EntityTypeShape EntityType="AppStoreModel.icon" Width="1.5" PointX="6" PointY="17" />
-        <EntityTypeShape EntityType="AppStoreModel.mobile_crash" Width="1.5" PointX="5.25" PointY="7.5" />
-        <EntityTypeShape EntityType="AppStoreModel.privacy" Width="1.5" PointX="0.75" PointY="9.125" />
-        <EntityTypeShape EntityType="AppStoreModel.release" Width="1.5" PointX="8.25" PointY="8" />
-        <EntityTypeShape EntityType="AppStoreModel.tracking" Width="1.5" PointX="5.25" PointY="3.125" />
-        <EntityTypeShape EntityType="AppStoreModel.user" Width="1.5" PointX="6" PointY="13.875" />
-        <EntityTypeShape EntityType="AppStoreModel.user_application" Width="1.5" PointX="8.25" PointY="4.75" />
-        <EntityTypeShape EntityType="AppStoreModel.user_application_role" Width="1.5" PointX="6" PointY="0.75" />
-        <EntityTypeShape EntityType="AppStoreModel.user_role" Width="1.5" PointX="3.75" PointY="14.25" />
+        <EntityTypeShape EntityType="AppStoreModel.action" Width="1.5" PointX="5.25" PointY="29" />
+        <EntityTypeShape EntityType="AppStoreModel.application" Width="1.5" PointX="3" PointY="11.125" />
+        <EntityTypeShape EntityType="AppStoreModel.device" Width="1.5" PointX="6" PointY="5.125" />
+        <EntityTypeShape EntityType="AppStoreModel.environment" Width="1.5" PointX="3" PointY="2.75" />
+        <EntityTypeShape EntityType="AppStoreModel.i18n" Width="1.5" PointX="0.75" PointY="12" />
+        <EntityTypeShape EntityType="AppStoreModel.icon" Width="1.5" PointX="3" PointY="19.25" />
+        <EntityTypeShape EntityType="AppStoreModel.mobile_crash" Width="1.5" PointX="5.25" PointY="15.5" />
+        <EntityTypeShape EntityType="AppStoreModel.privacy" Width="1.5" PointX="0.75" PointY="9.25" />
+        <EntityTypeShape EntityType="AppStoreModel.release" Width="1.5" PointX="5.25" PointY="11" />
+        <EntityTypeShape EntityType="AppStoreModel.tracking" Width="1.5" PointX="8.25" PointY="11.125" />
+        <EntityTypeShape EntityType="AppStoreModel.user" Width="1.5" PointX="3" PointY="5.75" />
+        <EntityTypeShape EntityType="AppStoreModel.user_application" Width="1.5" PointX="5.25" PointY="7.75" />
+        <EntityTypeShape EntityType="AppStoreModel.user_application_role" Width="1.5" PointX="3" PointY="8.625" />
+        <EntityTypeShape EntityType="AppStoreModel.user_role" Width="1.5" PointX="0.75" PointY="6.125" />
+        <EntityTypeShape EntityType="AppStoreModel.i18n_data" Width="1.5" PointX="3" PointY="16.125" />
+        <AssociationConnector Association="AppStoreModel.FK_action_application" />
+        <AssociationConnector Association="AppStoreModel.FK_application_i18n" />
         <AssociationConnector Association="AppStoreModel.FK_application_privacy" />
         <AssociationConnector Association="AppStoreModel.FK_mobile_crash_application" />
         <AssociationConnector Association="AppStoreModel.FK_release_application" />
@@ -28,6 +32,7 @@
         <AssociationConnector Association="AppStoreModel.FK_mobile_crash_environment" />
         <AssociationConnector Association="AppStoreModel.FK_release_environment" />
         <AssociationConnector Association="AppStoreModel.FK_tracking_environment" />
+        <AssociationConnector Association="AppStoreModel.FK_i18n_data_i18n" />
         <AssociationConnector Association="AppStoreModel.FK_release_icon" />
         <AssociationConnector Association="AppStoreModel.FK_user_application_user" />
         <AssociationConnector Association="AppStoreModel.FK_user_user_role" />

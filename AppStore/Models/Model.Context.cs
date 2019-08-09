@@ -29,6 +29,7 @@ namespace AppStore.Models
         public virtual DbSet<application> application { get; set; }
         public virtual DbSet<device> device { get; set; }
         public virtual DbSet<environment> environment { get; set; }
+        public virtual DbSet<i18n> i18n { get; set; }
         public virtual DbSet<icon> icon { get; set; }
         public virtual DbSet<mobile_crash> mobile_crash { get; set; }
         public virtual DbSet<privacy> privacy { get; set; }
@@ -38,5 +39,6 @@ namespace AppStore.Models
         public virtual DbSet<user_application> user_application { get; set; }
         public virtual DbSet<user_application_role> user_application_role { get; set; }
         public virtual DbSet<user_role> user_role { get; set; }
+        public virtual DbSet<i18n_data> i18n_data { get; set; }
     }
 }

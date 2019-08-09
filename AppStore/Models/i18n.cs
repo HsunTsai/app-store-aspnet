@@ -12,21 +12,23 @@ namespace AppStore.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class icon
+    public partial class i18n
     {
     	partial void Initialize();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public icon()
+        public i18n()
         {
-            this.release = new HashSet<release>();
+            this.application = new HashSet<application>();
+            this.i18n_data = new HashSet<i18n_data>();
     		Initialize();
         }
     
         public int id { get; set; }
-        public int user_id { get; set; }
-        public string path { get; set; }
+        public string type { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<release> release { get; set; }
+        public virtual ICollection<application> application { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<i18n_data> i18n_data { get; set; }
     }
 }

@@ -30,7 +30,24 @@ namespace AppStore.Controllers
             string user_id = Request.Properties["user"] as string;
             if (Service.isApplicationCanRead(db, user_id, id))
             {
-                List<release> releaseApps = ReleaseDAO.getReleaseList(db, id);
+                List<release> releaseApps = ReleaseDAO.getReleaseList(db, id, "", "");
+                return Ok(releaseApps);
+            }
+            else
+            {
+                return Content(HttpStatusCode.Unauthorized, new HttpMessage("insufficient_user_rights").toJson());
+            }
+        }
+
+        // GET: api/releases/{application_id}
+        [ResponseType(typeof(release))]
+        [JwtAuth]
+        public IHttpActionResult Getrelease(int id, [FromUri()]string device, [FromUri()]string environment)
+        {
+            string user_id = Request.Properties["user"] as string;
+            if (Service.isApplicationCanRead(db, user_id, id))
+            {
+                List<release> releaseApps = ReleaseDAO.getReleaseList(db, id, device, environment);
                 return Ok(releaseApps);
             }
             else

@@ -12,15 +12,14 @@ namespace AppStore.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class action
+    public partial class i18n_data
     {
     	partial void Initialize();
         public int id { get; set; }
-        public int application_id { get; set; }
-        public int action_id { get; set; }
-        public string name { get; set; }
-        public string note { get; set; }
+        public int i18n_id { get; set; }
+        public string key { get; set; }
+        public string value { get; set; }
     
-        public virtual application application { get; set; }
+        public virtual i18n i18n { get; set; }
     }
 }
